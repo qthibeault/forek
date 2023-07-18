@@ -16,6 +16,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
 # overridden on a per-target basis.
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Locate ANTLR jar file
+set(ANTLR_EXECUTABLE ${CMAKE_SOURCE_DIR}/vendor/antlr-4.13.0-complete.jar)
+
 add_library(${PROJECT_NAME})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS forek)
 
