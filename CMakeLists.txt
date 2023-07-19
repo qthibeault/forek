@@ -38,8 +38,7 @@ target_link_libraries(forek antlr4_static)
 
 # Add the source directory of this project.
 add_subdirectory(src)
-
-add_subdirectory(extras EXCLUDE_FROM_ALL)
+add_subdirectory(grammars EXCLUDE_FROM_ALL)
 
 # Examples
 add_subdirectory(examples EXCLUDE_FROM_ALL)
