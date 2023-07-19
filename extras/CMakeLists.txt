@@ -1,1 +1,0 @@
-add_subdirectory(grammars EXCLUDE_FROM_ALL)
