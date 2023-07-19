@@ -39,7 +39,6 @@ target_link_libraries(forek antlr4_static)
 # Add the source directory of this project.
 add_subdirectory(src)
 
-add_subdirectory(external)
 add_subdirectory(extras EXCLUDE_FROM_ALL)
 
 # Examples
