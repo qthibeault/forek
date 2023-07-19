@@ -1,6 +1,6 @@
 parser grammar TimedPropositionalTemporalLogicParser;
 
-import LinearTemporalLogicParser, ArithmeticParser;
+import PastTimeLinearTemporalLogicParser, ArithmeticParser;
 
 start : formula EOF ;
 
