@@ -31,10 +31,9 @@ function(PARSER grammar_name)
         ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 
     target_include_directories(${LIBRARY_NAME} PUBLIC
-        ${ANTLR_${LEXER}_OUTPUT_DIR} ${ANTLR_${PARSER}_OUTPUT_DIR})
-
-    target_include_directories(${LIBRARY_NAME} PRIVATE
-        ${ANTLR4_INCLUDE_DIRS})
+        ${ANTLR4_INCLUDE_DIRS}
+        ${ANTLR_${LEXER}_OUTPUT_DIR}
+        ${ANTLR_${PARSER}_OUTPUT_DIR})
 
     target_link_libraries(${LIBRARY_NAME} PRIVATE
         antlr4_static)
@@ -45,6 +44,7 @@ PARSER(PropositionalLogic LIBRARY_NAME pl_parser)
 PARSER(LinearTemporalLogic LIBRARY_NAME ltl_parser)
 PARSER(PastTimeLinearTemporalLogic LIBRARY_NAME pt_ltl_parser)
 PARSER(MetricTemporalLogic LIBRARY_NAME mtl_parser)
+PARSER(SignalTemporalLogic LIBRARY_NAME stl_parser)
 PARSER(TimedPropositionalTemporalLogic LIBRARY_NAME tptl_parser)
 PARSER(TimedQualityTemporalLogic LIBRARY_NAME tqtl_parser)
 PARSER(SpatioTemporalPerceptionLogic LIBRARY_NAME stpl_parser)
