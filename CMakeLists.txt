@@ -7,7 +7,6 @@ project(forek
   LANGUAGES CXX
 )
 
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
 
@@ -16,6 +15,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
 # This is disabled to protect unwarrented linking of other extensions but can be
 # overridden on a per-target basis.
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+# Generate compile_commands.json for editor tooling support
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(ExternalAntlr4Cpp)
