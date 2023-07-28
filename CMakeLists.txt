@@ -25,6 +25,7 @@ include(ExternalAntlr4Cpp)
 # Locate ANTLR jar file
 set(ANTLR_EXECUTABLE ${CMAKE_SOURCE_DIR}/vendor/antlr-4.13.0-complete.jar)
 
+add_subdirectory(grammars)
 
 add_library(${PROJECT_NAME})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS forek)
