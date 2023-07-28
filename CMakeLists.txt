@@ -27,8 +27,25 @@ set(ANTLR_EXECUTABLE ${CMAKE_SOURCE_DIR}/vendor/antlr-4.13.0-complete.jar)
 
 add_subdirectory(grammars)
 
-add_library(${PROJECT_NAME})
-add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS forek)
+add_library(forek STATIC
+    src/ir.cxx
+    src/pl.cxx)
+
+target_include_directories(forek PUBLIC
+    include)
+
+target_link_libraries(forek PRIVATE
+    pl_parser
+    ltl_parser
+    pt_ltl_parser
+    mtl_parser
+    stl_parser
+    tptl_parser
+    tqtl_parser
+    stpl_parser)
+
+# add_library(${PROJECT_NAME})
+# add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS forek)
 
 # Currently, all the headers must be publicly available as public `forek`
 # headers rely on private implementation headers that rely on external headers.
@@ -36,18 +53,14 @@ add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS forek)
 # Until a solution is found, users interfacing with this library should
 # exclusively include the library with the format <forek/...> to avoid accessing
 # unintended headers.
-target_include_directories(forek
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/specification>
-  SYSTEM $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/antlr4/runtime/Cpp/runtime/src/>
-)
+# target_include_directories(forek
+#   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+#   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/specification>
+#   SYSTEM $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/external/antlr4/runtime/Cpp/runtime/src/>
+# )
 
-target_link_libraries(forek antlr4_static)
-
-# Add the source directory of this project.
-add_subdirectory(src)
-add_subdirectory(grammars EXCLUDE_FROM_ALL)
+# target_link_libraries(forek antlr4_static)
 
 # Examples
-add_subdirectory(examples EXCLUDE_FROM_ALL)
-add_subdirectory(tests EXCLUDE_FROM_ALL)
+# add_subdirectory(examples EXCLUDE_FROM_ALL)
+# add_subdirectory(tests EXCLUDE_FROM_ALL)
