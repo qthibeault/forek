@@ -30,7 +30,13 @@ FetchAntlrJar(VERSION 4.13.0)
 add_subdirectory(grammars)
 
 add_library(forek STATIC
-    src/pl.cxx)
+    src/pl.cxx
+    src/ltl.cxx
+    src/mtl.cxx
+    src/stl.cxx
+    src/tptl.cxx
+    src/tqtl.cxx
+    src/stpl.cxx)
 
 target_include_directories(forek PUBLIC
     include)
