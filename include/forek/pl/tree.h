@@ -1,14 +1,15 @@
 #pragma once
 
-#include "forek/pl/visitor.h"
 #include "forek/ir.h"
+#include "forek/pl/visitor.h"
 
 namespace forek::pl {
 class Tree {
    private:
-    using Node = std::variant<forek::ir::Proposition, forek::ir::Negation<Tree>,
-                              forek::ir::Conjunction<Tree>, forek::ir::Disjunction<Tree>,
-                              forek::ir::Implication<Tree>, forek::ir::Equivalence<Tree> >;
+    using Node = std::variant<forek::ir::True, forek::ir::False, forek::ir::Proposition,
+                              forek::ir::Negation<Tree>, forek::ir::Conjunction<Tree>,
+                              forek::ir::Disjunction<Tree>, forek::ir::Implication<Tree>,
+                              forek::ir::Equivalence<Tree> >;
 
     Node m_node;
 

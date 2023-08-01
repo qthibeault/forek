@@ -10,6 +10,8 @@
 #include "PropositionalLogicParserVisitor.h"
 
 using forek::pl::Formula;
+using forek::ir::True;
+using forek::ir::False;
 using forek::ir::Proposition;
 using forek::ir::Negation;
 using forek::ir::Conjunction;
@@ -31,11 +33,11 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
     }
 
     auto visitPlTrue(PropositionalLogicParser::PlTrueContext *ctx) -> std::any override {
-        return 0;
+        return Tree {True {}};
     }
 
     auto visitPlFalse(PropositionalLogicParser::PlFalseContext *ctx) -> std::any override {
-        return 0;
+        return Tree {False {}};
     }
     
     auto visitProposition(PropositionalLogicParser::PropositionContext *ctx) -> std::any override {
@@ -103,7 +105,6 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
 };
 
 Formula::Formula(std::string formula) {
-
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
