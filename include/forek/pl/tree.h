@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 #include "forek/ir.h"
 #include "forek/pl/visitor.h"
 
