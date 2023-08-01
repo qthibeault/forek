@@ -52,4 +52,5 @@ target_link_libraries(forek PRIVATE
     tqtl_parser
     stpl_parser)
 
+enable_testing()
 add_subdirectory(tests)
