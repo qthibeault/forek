@@ -1,6 +1,0 @@
-target_sources(forek PRIVATE
-  TimedPropositionalTemporalLogicLexer.cpp
-  TimedPropositionalTemporalLogicParserBaseVisitor.cpp
-  TimedPropositionalTemporalLogicParser.cpp
-  TimedPropositionalTemporalLogicParserVisitor.cpp
-)
