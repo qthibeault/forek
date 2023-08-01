@@ -42,7 +42,7 @@ struct Negation {
     Negation(Negation<Subtree>&& other) = default;
 
     Negation(const Negation<Subtree>& other) : m_tree{nullptr} {
-        this->m_tree = std::make_unique<Subtree>(other);
+        this->m_tree = std::make_unique<Subtree>(*other.m_tree);
     }
 
     explicit Negation(const Subtree& subtree) : m_tree{nullptr} {
