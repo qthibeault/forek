@@ -2,9 +2,22 @@
 
 #include <memory>
 #include <string>
-#include <variant>
 
 namespace forek::ir {
+struct True {
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_true();
+    }
+};
+
+struct False {
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_false();
+    }
+};
+
 struct Proposition {
     std::string m_name;
 
