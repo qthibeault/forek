@@ -30,7 +30,7 @@ struct Proposition {
 
     template <typename V>
     auto visit(V& visitor) {
-        return visitor.visit_proposition(visitor);
+        return visitor.visit_proposition(m_name);
     }
 };
 
