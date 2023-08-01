@@ -36,6 +36,7 @@ target_include_directories(forek PUBLIC
     include)
 
 target_link_libraries(forek PRIVATE
+    arithmetic_parser
     pl_parser
     ltl_parser
     pt_ltl_parser
