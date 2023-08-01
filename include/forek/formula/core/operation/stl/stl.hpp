@@ -1,6 +1,0 @@
-#ifndef FOREK_FORMULA_CORE_OPERATION_STL_STL_HPP
-#define FOREK_FORMULA_CORE_OPERATION_STL_STL_HPP
-
-#include "predicate.hpp"
-
-#endif
