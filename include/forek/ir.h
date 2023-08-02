@@ -36,21 +36,18 @@ struct Proposition {
 
 template <typename Subtree>
 struct Negation {
-    std::unique_ptr<Subtree> m_tree;
+    std::shared_ptr<Subtree> m_tree;
 
     Negation() = delete;
+    Negation(const Negation<Subtree>& other) = default;
     Negation(Negation<Subtree>&& other) = default;
 
-    Negation(const Negation<Subtree>& other) : m_tree{nullptr} {
-        this->m_tree = std::make_unique<Subtree>(*other.m_tree);
-    }
-
     explicit Negation(const Subtree& subtree) : m_tree{nullptr} {
-        this->m_tree = std::make_unique<Subtree>(subtree);
+        this->m_tree = std::make_shared<Subtree>(subtree);
     }
 
     explicit Negation(Subtree&& subtree) : m_tree{nullptr} {
-        this->m_tree = std::make_unique<Subtree>(std::move(subtree));
+        this->m_tree = std::make_shared<Subtree>(std::move(subtree));
     }
 
     template <typename V>
@@ -61,21 +58,21 @@ struct Negation {
 
 template <typename Subtree>
 struct Conjunction {
-    std::unique_ptr<Subtree> m_left;
-    std::unique_ptr<Subtree> m_right;
+    std::shared_ptr<Subtree> m_left;
+    std::shared_ptr<Subtree> m_right;
 
     Conjunction() = delete;
-    Conjunction(const Conjunction<Subtree>& other) : Conjunction(*other.m_left, *other.m_right) {}
+    Conjunction(const Conjunction<Subtree>& other) = default;
     Conjunction(Conjunction<Subtree>&& other) = default;
 
     Conjunction(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(left);
-        this->m_right = std::make_unique<Subtree>(right);
+        this->m_left = std::make_shared<Subtree>(left);
+        this->m_right = std::make_shared<Subtree>(right);
     }
 
     Conjunction(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(std::move(left));
-        this->m_right = std::make_unique<Subtree>(std::move(right));
+        this->m_left = std::make_shared<Subtree>(std::move(left));
+        this->m_right = std::make_shared<Subtree>(std::move(right));
     }
 
     template <typename V>
@@ -86,21 +83,21 @@ struct Conjunction {
 
 template <typename Subtree>
 struct Disjunction {
-    std::unique_ptr<Subtree> m_left;
-    std::unique_ptr<Subtree> m_right;
+    std::shared_ptr<Subtree> m_left;
+    std::shared_ptr<Subtree> m_right;
 
     Disjunction() = delete;
-    Disjunction(const Disjunction<Subtree>& other) : Disjunction(*other.m_left, *other.m_right) {}
+    Disjunction(const Disjunction<Subtree>& other) = default;
     Disjunction(Disjunction<Subtree>&& other) = default;
 
     Disjunction(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(left);
-        this->m_right = std::make_unique<Subtree>(right);
+        this->m_left = std::make_shared<Subtree>(left);
+        this->m_right = std::make_shared<Subtree>(right);
     }
 
     Disjunction(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(std::move(left));
-        this->m_right = std::make_unique<Subtree>(std::move(right));
+        this->m_left = std::make_shared<Subtree>(std::move(left));
+        this->m_right = std::make_shared<Subtree>(std::move(right));
     }
 
     template <typename V>
@@ -111,21 +108,21 @@ struct Disjunction {
 
 template <typename Subtree>
 struct Implication {
-    std::unique_ptr<Subtree> m_left;
-    std::unique_ptr<Subtree> m_right;
+    std::shared_ptr<Subtree> m_left;
+    std::shared_ptr<Subtree> m_right;
 
     Implication() = delete;
-    Implication(const Implication<Subtree>& other) : Implication(*other.m_left, *other.m_right) {}
+    Implication(const Implication<Subtree>& other) = default;
     Implication(Implication<Subtree>&& other) = default;
 
     Implication(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(left);
-        this->m_right = std::make_unique<Subtree>(right);
+        this->m_left = std::make_shared<Subtree>(left);
+        this->m_right = std::make_shared<Subtree>(right);
     }
 
     Implication(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(std::move(left));
-        this->m_right = std::make_unique<Subtree>(std::move(right));
+        this->m_left = std::make_shared<Subtree>(std::move(left));
+        this->m_right = std::make_shared<Subtree>(std::move(right));
     }
 
     template <typename V>
@@ -136,21 +133,21 @@ struct Implication {
 
 template <typename Subtree>
 struct Equivalence {
-    std::unique_ptr<Subtree> m_left;
-    std::unique_ptr<Subtree> m_right;
+    std::shared_ptr<Subtree> m_left;
+    std::shared_ptr<Subtree> m_right;
 
     Equivalence() = delete;
-    Equivalence(const Equivalence<Subtree>& other) : Equivalence(*other.m_left, *other.m_right) {}
+    Equivalence(const Equivalence<Subtree>& other) = default;
     Equivalence(Equivalence<Subtree>&& other) = default;
 
     Equivalence(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(left);
-        this->m_right = std::make_unique<Subtree>(right);
+        this->m_left = std::make_shared<Subtree>(left);
+        this->m_right = std::make_shared<Subtree>(right);
     }
 
     Equivalence(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_unique<Subtree>(std::move(left));
-        this->m_right = std::make_unique<Subtree>(std::move(right));
+        this->m_left = std::make_shared<Subtree>(std::move(left));
+        this->m_right = std::make_shared<Subtree>(std::move(right));
     }
 
     template <typename V>
