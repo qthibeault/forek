@@ -6,8 +6,8 @@ namespace forek::ltl {
 template <typename T>
 class Visitor : public virtual pl::Visitor<T> {
    public:
-    virtual auto visit_always(T inner) -> T;
-    virtual auto visit_eventually(T inner) -> T;
+    virtual auto visit_globally(T inner) -> T;
+    virtual auto visit_finally(T inner) -> T;
     virtual auto visit_next(T inner) -> T;
     virtual auto visit_release(T inner) -> T;
     virtual auto visit_until(T inner) -> T;
