@@ -13,6 +13,6 @@ class Formula {
     auto evaluate(const forek::pl::Visitor<T>& v) -> T;
 
    private:
-    std::unique_ptr<Tree> m_root;
+    std::shared_ptr<Tree> m_root;
 };
 }  // namespace forek::pl
