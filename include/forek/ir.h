@@ -35,134 +35,12 @@ struct Proposition {
 };
 
 template <typename Subtree>
-struct Negation {
-    std::shared_ptr<Subtree> m_tree;
-
-    Negation() = delete;
-    Negation(const Negation<Subtree>& other) = default;
-    Negation(Negation<Subtree>&& other) = default;
-
-    explicit Negation(const Subtree& subtree) : m_tree{nullptr} {
-        this->m_tree = std::make_shared<Subtree>(subtree);
-    }
-
-    explicit Negation(Subtree&& subtree) : m_tree{nullptr} {
-        this->m_tree = std::make_shared<Subtree>(std::move(subtree));
-    }
-
-    template <typename V>
-    auto visit(V& visitor) {
-        return visitor.visit_negation(m_tree->visit(visitor));
-    }
-};
-
-template <typename Subtree>
-struct Conjunction {
-    std::shared_ptr<Subtree> m_left;
-    std::shared_ptr<Subtree> m_right;
-
-    Conjunction() = delete;
-    Conjunction(const Conjunction<Subtree>& other) = default;
-    Conjunction(Conjunction<Subtree>&& other) = default;
-
-    Conjunction(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(left);
-        this->m_right = std::make_shared<Subtree>(right);
-    }
-
-    Conjunction(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(std::move(left));
-        this->m_right = std::make_shared<Subtree>(std::move(right));
-    }
-
-    template <typename V>
-    auto visit(V& visitor) {
-        return visitor.visit_conjunction(m_left->visit(visitor), m_right->visit(visitor));
-    }
-};
-
-template <typename Subtree>
-struct Disjunction {
-    std::shared_ptr<Subtree> m_left;
-    std::shared_ptr<Subtree> m_right;
-
-    Disjunction() = delete;
-    Disjunction(const Disjunction<Subtree>& other) = default;
-    Disjunction(Disjunction<Subtree>&& other) = default;
-
-    Disjunction(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(left);
-        this->m_right = std::make_shared<Subtree>(right);
-    }
-
-    Disjunction(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(std::move(left));
-        this->m_right = std::make_shared<Subtree>(std::move(right));
-    }
-
-    template <typename V>
-    auto visit(V& visitor) {
-        return visitor.visit_disjunction(m_left->visit(visitor), m_right->visit(visitor));
-    }
-};
-
-template <typename Subtree>
-struct Implication {
-    std::shared_ptr<Subtree> m_left;
-    std::shared_ptr<Subtree> m_right;
-
-    Implication() = delete;
-    Implication(const Implication<Subtree>& other) = default;
-    Implication(Implication<Subtree>&& other) = default;
-
-    Implication(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(left);
-        this->m_right = std::make_shared<Subtree>(right);
-    }
-
-    Implication(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(std::move(left));
-        this->m_right = std::make_shared<Subtree>(std::move(right));
-    }
-
-    template <typename V>
-    auto visit(V& visitor) {
-        return visitor.visit_implication(m_left->visit(visitor), m_right->visit(visitor));
-    }
-};
-
-template <typename Subtree>
-struct Equivalence {
-    std::shared_ptr<Subtree> m_left;
-    std::shared_ptr<Subtree> m_right;
-
-    Equivalence() = delete;
-    Equivalence(const Equivalence<Subtree>& other) = default;
-    Equivalence(Equivalence<Subtree>&& other) = default;
-
-    Equivalence(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(left);
-        this->m_right = std::make_shared<Subtree>(right);
-    }
-
-    Equivalence(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        this->m_left = std::make_shared<Subtree>(std::move(left));
-        this->m_right = std::make_shared<Subtree>(std::move(right));
-    }
-
-    template <typename V>
-    auto visit(V& visitor) {
-        return visitor.visit_equivalence(m_left->visit(visitor), m_right->visit(visitor));
-    }
-};
-
-template <typename Subtree>
 class Unary {
    public:
     Unary() = delete;
 
    protected:
-    std::unique_ptr<Subtree> m_inner;
+    std::shared_ptr<Subtree> m_inner;
 
     Unary(const Unary<Subtree>&) = default;
     Unary(Unary<Subtree>&&) = default;
@@ -173,6 +51,122 @@ class Unary {
 
     explicit Unary(Subtree&& other) : m_inner{nullptr} {
         m_inner = std::make_shared<Subtree>(std::move(other));
+    }
+};
+
+template <typename Subtree>
+struct Negation : Unary<Subtree> {
+    Negation() = delete;
+    Negation(const Negation<Subtree>& other) : Unary<Subtree>(other) {}
+    Negation(Negation<Subtree>&& other) : Unary<Subtree>(std::move(other)) {}
+
+    explicit Negation(const Subtree& subtree) : Unary<Subtree>(subtree) {}
+    explicit Negation(Subtree&& subtree) : Unary<Subtree>(std::move(subtree)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_negation(this->m_tree->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+class Binary {
+   public:
+    Binary() = delete;
+
+   protected:
+    std::shared_ptr<Subtree> m_left;
+    std::shared_ptr<Subtree> m_right;
+
+    Binary(const Binary<Subtree>&) = default;
+    Binary(Binary<Subtree>&&) = default;
+
+    Binary(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
+        m_left = std::make_shared<Subtree>(left);
+        m_right = std::make_shared<Subtree>(right);
+    }
+
+    Binary(const Subtree& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
+        m_left = std::make_shared<Subtree>(left);
+        m_right = std::make_shared<Subtree>(std::move(right));
+    }
+
+    Binary(Subtree&& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
+        m_left = std::make_shared<Subtree>(std::move(left));
+        m_right = std::make_shared<Subtree>(right);
+    }
+
+    Binary(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
+        m_left = std::make_shared<Subtree>(std::move(left));
+        m_right = std::make_shared<Subtree>(std::move(right));
+    }
+};
+
+template <typename Subtree>
+struct Conjunction : Binary<Subtree> {
+    Conjunction() = delete;
+    Conjunction(const Conjunction<Subtree>& other) : Binary<Subtree>(other) {}
+    Conjunction(Conjunction<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
+
+    Conjunction(const Subtree& left, const Subtree& right) : Binary<Subtree>(left, right) {}
+    Conjunction(const Subtree& left, Subtree&& right) : Binary<Subtree>(left, std::move(right)) {}
+    Conjunction(Subtree&& left, const Subtree& right) : Binary<Subtree>(std::move(left), right) {}
+    Conjunction(Subtree&& left, Subtree&& right) : Binary<Subtree>(std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_conjunction(this->m_left->visit(visitor), this->m_right->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+struct Disjunction : Binary<Subtree> {
+    Disjunction() = delete;
+    Disjunction(const Disjunction<Subtree>& other) : Binary<Subtree>(other) {}
+    Disjunction(Disjunction<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
+
+    Disjunction(const Subtree& left, const Subtree& right) : Binary<Subtree>(left, right) {}
+    Disjunction(const Subtree& left, Subtree&& right) : Binary<Subtree>(left, std::move(right)) {}
+    Disjunction(Subtree&& left, const Subtree& right) : Binary<Subtree>(std::move(left), right) {}
+    Disjunction(Subtree&& left, Subtree&& right) : Binary<Subtree>(std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_disjunction(this->m_left->visit(visitor), this->m_right->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+struct Implication : Binary<Subtree> {
+    Implication() = delete;
+    Implication(const Implication<Subtree>& other) : Binary<Subtree>(other) {}
+    Implication(Implication<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
+
+    Implication(const Subtree& left, const Subtree& right) : Binary<Subtree>(left, right) {}
+    Implication(const Subtree& left, Subtree&& right) : Binary<Subtree>(left, std::move(right)) {}
+    Implication(Subtree&& left, const Subtree& right) : Binary<Subtree>(std::move(left), right) {}
+    Implication(Subtree&& left, Subtree&& right) : Binary<Subtree>(std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_implication(this->m_left->visit(visitor), this->m_right->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+struct Equivalence : Binary<Subtree> {
+    Equivalence() = delete;
+    Equivalence(const Equivalence<Subtree>& other) : Binary<Subtree>(other) {};
+    Equivalence(Equivalence<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
+
+    Equivalence(const Subtree& left, const Subtree& right) : Binary<Subtree>(left, right) {}
+    Equivalence(const Subtree& left, Subtree&& right) : Binary<Subtree>(left, std::move(right)) {}
+    Equivalence(Subtree&& left, const Subtree& right) : Binary<Subtree>(std::move(left), right) {}
+    Equivalence(Subtree&& left, Subtree&& right) : Binary<Subtree>(std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_equivalence(this->m_left->visit(visitor), this->m_right->visit(visitor));
     }
 };
 
@@ -218,39 +212,6 @@ struct Next : public Unary<Subtree> {
     template<typename V>
     auto visit(V& visitor) {
         return visitor.visit_next(this->m_inner->visit(visitor));
-    }
-};
-
-template <typename Subtree>
-class Binary {
-   public:
-    Binary() = delete;
-
-   protected:
-    std::shared_ptr<Subtree> m_left;
-    std::shared_ptr<Subtree> m_right;
-
-    Binary(const Binary<Subtree>&) = default;
-    Binary(Binary<Subtree>&&) = default;
-
-    Binary(const Subtree& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        m_left = std::make_shared<Subtree>(left);
-        m_right = std::make_shared<Subtree>(right);
-    }
-
-    Binary(const Subtree& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        m_left = std::make_shared<Subtree>(left);
-        m_right = std::make_shared<Subtree>(std::move(right));
-    }
-
-    Binary(Subtree&& left, const Subtree& right) : m_left{nullptr}, m_right{nullptr} {
-        m_left = std::make_shared<Subtree>(std::move(left));
-        m_right = std::make_shared<Subtree>(right);
-    }
-
-    Binary(Subtree&& left, Subtree&& right) : m_left{nullptr}, m_right{nullptr} {
-        m_left = std::make_shared<Subtree>(std::move(left));
-        m_right = std::make_shared<Subtree>(std::move(right));
     }
 };
 
