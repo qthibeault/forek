@@ -5,6 +5,9 @@
 
 namespace forek::pl {
 class Formula {
+   private:
+    std::shared_ptr<Tree> m_root;
+
    public:
     Formula() = delete;
     Formula(const Formula& other) = default;
@@ -17,8 +20,5 @@ class Formula {
     auto evaluate(forek::pl::Visitor<T>& v) -> T {
         return m_root->visit(v);
     }
-
-   private:
-    std::shared_ptr<Tree> m_root;
 };
 }  // namespace forek::pl
