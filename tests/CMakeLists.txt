@@ -7,11 +7,11 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-add_executable(testpl pl.cxx)
-target_link_libraries(testpl PRIVATE forek Catch2::Catch2WithMain)
+add_executable(pl pl.cxx)
+target_link_libraries(pl PRIVATE forek Catch2::Catch2WithMain)
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 
-catch_discover_tests(testpl)
+catch_discover_tests(pl)
