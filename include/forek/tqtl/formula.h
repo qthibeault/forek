@@ -8,4 +8,3 @@ class Formula {
     explicit Formula(std::string formula);
 };
 }  // namespace forek::tqtl
-
