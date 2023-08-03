@@ -7,6 +7,11 @@
 namespace forek::pl {
 class Formula {
    public:
+    Formula() = delete;
+    Formula(const Formula& other) = default;
+    Formula(Formula&& other) = default;
+    ~Formula() = default;
+
     explicit Formula(std::string formula);
 
     template <typename T>
