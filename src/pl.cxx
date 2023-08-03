@@ -118,5 +118,5 @@ Formula::Formula(std::string formula) {
     auto output = builder.visit(parser.start());
     auto root = std::any_cast<Tree>(output);
 
-    this->m_root = std::make_unique<Tree>(std::move(root));
+    this->m_root = std::make_shared<Tree>(std::move(root));
 }
