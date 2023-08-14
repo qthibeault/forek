@@ -21,8 +21,7 @@ class Tree {
     Tree(const Tree& other) = default;
     Tree(Tree&& other) = default;
 
-    explicit Tree(const Node& node) : m_node{node} {}
-    explicit Tree(Node&& node) : m_node{std::move(node)} {}
+    explicit Tree(Node node) : m_node{std::move(node)} {}
 
     template <typename T>
     auto visit(Visitor<T>& v) {
