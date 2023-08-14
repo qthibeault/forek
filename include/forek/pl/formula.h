@@ -15,6 +15,7 @@ class Formula {
     ~Formula() = default;
 
     explicit Formula(std::string formula);
+    explicit Formula(Tree root);
 
     template <typename T>
     auto evaluate(forek::pl::Visitor<T>& v) -> T {

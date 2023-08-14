@@ -109,7 +109,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
     }
 };
 
-Formula::Formula(std::string formula) {
+Formula::Formula(std::string formula) : m_root{nullptr} {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
@@ -118,5 +118,9 @@ Formula::Formula(std::string formula) {
     auto output = builder.visit(parser.start());
     auto root = std::any_cast<Tree>(output);
 
+    this->m_root = std::make_shared<Tree>(std::move(root));
+}
+
+Formula::Formula(Tree root) : m_root{nullptr} {
     this->m_root = std::make_shared<Tree>(std::move(root));
 }
