@@ -173,3 +173,7 @@ Formula::Formula(std::string formula) {
 
     this->m_root = std::make_shared<Tree>(std::move(root));
 }
+
+Formula::Formula(Tree root) {
+    this->m_root = std::make_shared<Tree>(std::move(root));
+}

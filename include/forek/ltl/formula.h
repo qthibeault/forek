@@ -16,6 +16,7 @@ class Formula {
     Formula(Formula&& other) = default;
 
     explicit Formula(std::string formula);
+    explicit Formula(Tree root);
 
     template <typename T>
     auto evaluate(Visitor<T>& v) {
