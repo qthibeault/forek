@@ -27,6 +27,13 @@ include(FetchAntlrJar)
 # set(ANTLR_EXECUTABLE ${CMAKE_SOURCE_DIR}/vendor/antlr-4.13.0-complete.jar)
 FetchAntlrJar(VERSION 4.13.0)
 
+# Download fmt library
+FetchContent_Declare(fmtlib
+    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_TAG 10.1.0)
+
+FetchContent_MakeAvailable(fmtlib)
+
 add_subdirectory(grammars)
 
 add_library(forek STATIC
@@ -50,7 +57,8 @@ target_link_libraries(forek PRIVATE
     stl_parser
     tptl_parser
     tqtl_parser
-    stpl_parser)
+    stpl_parser
+    fmt::fmt-header-only)
 
 enable_testing()
 add_subdirectory(tests)
