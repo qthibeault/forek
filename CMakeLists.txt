@@ -37,6 +37,7 @@ FetchContent_MakeAvailable(fmtlib)
 add_subdirectory(grammars)
 
 add_library(forek STATIC
+    src/interval.cxx
     src/pl.cxx
     src/ltl.cxx
     src/mtl.cxx
