@@ -39,14 +39,12 @@ class Unary {
     Unary() = delete;
 
    protected:
-    std::shared_ptr<Subtree> m_inner {nullptr};
+    std::shared_ptr<Subtree> m_inner{nullptr};
 
     Unary(const Unary<Subtree>&) = default;
     Unary(Unary<Subtree>&&) = default;
 
-    explicit Unary(Subtree&& tree) {
-        m_inner = std::make_shared<Subtree>(std::move(tree));
-    }
+    explicit Unary(Subtree&& tree) { m_inner = std::make_shared<Subtree>(std::move(tree)); }
 };
 
 template <typename Subtree>
@@ -69,8 +67,8 @@ class Binary {
     Binary() = delete;
 
    protected:
-    std::shared_ptr<Subtree> m_left {nullptr};
-    std::shared_ptr<Subtree> m_right {nullptr};
+    std::shared_ptr<Subtree> m_left{nullptr};
+    std::shared_ptr<Subtree> m_right{nullptr};
 
     Binary(const Binary<Subtree>&) = default;
     Binary(Binary<Subtree>&&) = default;
@@ -90,7 +88,8 @@ struct Conjunction : Binary<Subtree> {
 
     template <typename V>
     auto visit(V& visitor) {
-        return visitor.visit_conjunction(this->m_left->visit(visitor), this->m_right->visit(visitor));
+        return visitor.visit_conjunction(this->m_left->visit(visitor),
+                                         this->m_right->visit(visitor));
     }
 };
 
@@ -103,7 +102,8 @@ struct Disjunction : Binary<Subtree> {
 
     template <typename V>
     auto visit(V& visitor) {
-        return visitor.visit_disjunction(this->m_left->visit(visitor), this->m_right->visit(visitor));
+        return visitor.visit_disjunction(this->m_left->visit(visitor),
+                                         this->m_right->visit(visitor));
     }
 };
 
@@ -116,20 +116,22 @@ struct Implication : Binary<Subtree> {
 
     template <typename V>
     auto visit(V& visitor) {
-        return visitor.visit_implication(this->m_left->visit(visitor), this->m_right->visit(visitor));
+        return visitor.visit_implication(this->m_left->visit(visitor),
+                                         this->m_right->visit(visitor));
     }
 };
 
 template <typename Subtree>
 struct Equivalence : Binary<Subtree> {
     Equivalence() = delete;
-    Equivalence(const Equivalence<Subtree>& other) : Binary<Subtree>(other) {};
+    Equivalence(const Equivalence<Subtree>& other) : Binary<Subtree>(other){};
     Equivalence(Equivalence<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
     Equivalence(Subtree left, Subtree right) : Binary<Subtree>(std::move(left), std::move(right)) {}
 
     template <typename V>
     auto visit(V& visitor) {
-        return visitor.visit_equivalence(this->m_left->visit(visitor), this->m_right->visit(visitor));
+        return visitor.visit_equivalence(this->m_left->visit(visitor),
+                                         this->m_right->visit(visitor));
     }
 };
 
@@ -155,7 +157,7 @@ struct Finally : public Unary<Subtree> {
 
     explicit Finally(Subtree inner) : Unary<Subtree>(std::move(inner)) {}
 
-    template<typename V>
+    template <typename V>
     auto visit(V& visitor) {
         return visitor.visit_finally(this->m_inner->visit(visitor));
     }
@@ -169,7 +171,7 @@ struct Next : public Unary<Subtree> {
 
     explicit Next(Subtree inner) : Unary<Subtree>(std::move(inner)) {}
 
-    template<typename V>
+    template <typename V>
     auto visit(V& visitor) {
         return visitor.visit_next(this->m_inner->visit(visitor));
     }
