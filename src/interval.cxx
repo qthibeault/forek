@@ -1,7 +1,7 @@
+#include "forek/interval.h"
+
 #include <fmt/core.h>
 #include <fmt/format.h>
-
-#include "forek/interval.h"
 
 using forek::interval::Endpoint;
 using forek::interval::Exclusive;
@@ -26,17 +26,38 @@ Interval::Interval(Endpoint lower, Endpoint upper)
     }
 }
 
-Interval::operator std::string() const {
+template <>
+struct fmt::formatter<Interval> {
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx) {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const Interval& i, FormatContext& ctx) {
+        auto open_visitor = OpenSymbolVisitor{};
+        auto open = i.lower.visit(open_visitor);
+        auto start = i.lower.value();
+
+        auto close_visitor = CloseSymbolVisitor{};
+        auto close = i.upper.visit(close_visitor);
+        auto end = i.upper.value();
+
+        return fmt::format_to(ctx.out(), "{}{},{}{}", open, start, end, close);
+    }
+};
+
+auto interval_string(const Interval& i) -> std::string {
     auto open_visitor = OpenSymbolVisitor{};
-    auto open = lower.visit(open_visitor);
-    auto start = lower.value();
+    auto open = i.lower.visit(open_visitor);
+    auto start = i.lower.value();
 
     auto close_visitor = CloseSymbolVisitor{};
-    auto close = upper.visit(close_visitor);
-    auto end = upper.value();
+    auto close = i.upper.visit(close_visitor);
+    auto end = i.upper.value();
 
     return fmt::format("{}{},{}{}", open, start, end, close);
 }
 
 ZeroLengthInterval::ZeroLengthInterval(const Interval& i)
-    : m_msg{fmt::format("Interval {} has a length of zero", std::string{i})} {}
+    : m_msg{fmt::format("Interval {} has a length of zero", i)} {}
