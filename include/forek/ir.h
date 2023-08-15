@@ -3,6 +3,8 @@
 #include <memory>
 #include <string>
 
+#include "forek/interval.h"
+
 namespace forek::ir {
 struct True {
     template <typename V>
@@ -204,6 +206,92 @@ class Until : Binary<Subtree> {
     template <typename V>
     auto visit(V& visitor) {
         return visitor.visit_until(this->m_left->visit(visitor), this->m_right->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+class BoundedUnary : public Unary<Subtree> {
+   public:
+    BoundedUnary() = delete;
+
+   protected:
+    interval::Interval m_interval;
+
+    BoundedUnary(const BoundedUnary<Subtree>& other) : Unary<Subtree>(other) {}
+    BoundedUnary(BoundedUnary<Subtree>&& other) : Unary<Subtree>(std::move(other)) {}
+    BoundedUnary(interval::Interval&& i, Subtree&& tree)
+        : m_interval{std::move(i)}, Unary<Subtree>(tree) {}
+};
+
+template <typename Subtree>
+class BoundedGlobally : public BoundedUnary<Subtree> {
+   public:
+    BoundedGlobally() = delete;
+    BoundedGlobally(const BoundedGlobally<Subtree>& other) : BoundedUnary<Subtree>(other) {}
+    BoundedGlobally(BoundedGlobally<Subtree>&& other) : BoundedUnary<Subtree>(std::move(other)) {}
+    BoundedGlobally(interval::Interval i, Subtree tree)
+        : BoundedUnary<Subtree>(std::move(i), std::move(tree)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return this->m_inner.visit_bounded_globally(this->m_interval, this->m_inner->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+class BoundedFinally : public BoundedUnary<Subtree> {
+   public:
+    BoundedFinally() = delete;
+    BoundedFinally(const BoundedFinally<Subtree>& other) : BoundedUnary<Subtree>(other) {}
+    BoundedFinally(BoundedFinally<Subtree>&& other) : BoundedUnary<Subtree>(std::move(other)) {}
+    BoundedFinally(interval::Interval i, Subtree tree)
+        : BoundedUnary<Subtree>(std::move(i), std::move(tree)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return this->m_inner.visit_bounded_finally(this->m_interval, this->m_inner->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+class BoundedBinary : public Binary<Subtree> {
+   public:
+    BoundedBinary() = delete;
+
+   private:
+    interval::Interval m_interval;
+
+    BoundedBinary(const BoundedBinary<Subtree>& other) : Binary<Subtree>(other) {}
+    BoundedBinary(BoundedBinary<Subtree>&& other) : Binary<Subtree>(std::move(other)) {}
+    BoundedBinary(interval::Interval&& i, Subtree&& left, Subtree&& right)
+        : m_interval{std::move(i)}, Binary<Subtree>(std::move(left), std::move(right)) {}
+};
+
+template <typename Subtree>
+class BoundedRelease : public BoundedBinary<Subtree> {
+   public:
+    BoundedRelease() = delete;
+    BoundedRelease(const BoundedRelease<Subtree>& other) : BoundedBinary<Subtree>(other) {}
+    BoundedRelease(BoundedRelease<Subtree>&& other) : BoundedBinary<Subtree>(std::move(other)) {}
+    BoundedRelease(interval::Interval i, Subtree left, Subtree right) : BoundedBinary<Subtree>(std::move(i), std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_bounded_release(this->m_interval, this->m_left->visit(visitor), this->m_right->visit(visitor));
+    }
+};
+
+template <typename Subtree>
+class BoundedUntil : public BoundedBinary<Subtree> {
+   public:
+    BoundedUntil() = delete;
+    BoundedUntil(const BoundedUntil<Subtree>& other) : BoundedBinary<Subtree>(other) {}
+    BoundedUntil(BoundedUntil<Subtree>&& other) : BoundedBinary<Subtree>(std::move(other)) {}
+    BoundedUntil(interval::Interval i, Subtree left, Subtree right) : BoundedBinary<Subtree>(std::move(i), std::move(left), std::move(right)) {}
+
+    template <typename V>
+    auto visit(V& visitor) {
+        return visitor.visit_bounded_until(this->m_interval, this->m_left->visit(visitor), this->m_right->visit(visitor));
     }
 };
 }  // namespace forek::ir
