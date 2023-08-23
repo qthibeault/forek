@@ -1,5 +1,5 @@
 ---
-Checks:          'cert-*,clang-analyzer-*,concurrency-*,google-*,modernize-*'
+Checks:          'cert-*,clang-analyzer-*,concurrency-*,google-*,modernize-*,cppcoreguidelines-*'
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: false
