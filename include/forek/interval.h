@@ -6,7 +6,7 @@
 
 namespace forek::interval {
 struct Inclusive {
-    const double value;
+    double value;
 
     explicit Inclusive(double v) : value{v} {}
 
@@ -15,7 +15,7 @@ struct Inclusive {
 };
 
 struct Exclusive {
-    const double value;
+    double value;
 
     explicit Exclusive(double v) : value{v} {}
 
@@ -25,7 +25,7 @@ struct Exclusive {
 
 class Endpoint {
    private:
-    const std::variant<Inclusive, Exclusive> m_inner;
+    std::variant<Inclusive, Exclusive> m_inner;
 
    public:
     Endpoint(Inclusive inner) : m_inner{inner} {}  // NOLINT(google-explicit-constructor)
@@ -48,15 +48,15 @@ class Endpoint {
 };
 
 struct Interval {
-    const Endpoint lower;
-    const Endpoint upper;
+    Endpoint lower;
+    Endpoint upper;
 
     Interval(Endpoint start, Endpoint end);
 };
 
 class ZeroLengthInterval : std::exception {
    private:
-    const std::string m_msg;
+    std::string m_msg;
 
    public:
     explicit ZeroLengthInterval(const Interval &interval);
