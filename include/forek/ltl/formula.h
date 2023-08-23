@@ -20,7 +20,7 @@ class Formula {
 
     template <typename T>
     auto evaluate(Visitor<T> &v) {
-        return m_root->visit(v);
+        return m_root->accept(v);
     }
 };
 

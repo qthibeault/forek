@@ -19,7 +19,7 @@ class Formula {
 
     template <typename T>
     auto evaluate(forek::pl::Visitor<T> &v) -> T {
-        return m_root->visit(v);
+        return m_root->accept(v);
     }
 };
 }  // namespace forek::pl
