@@ -5,26 +5,25 @@
 #include <variant>
 
 namespace forek::interval {
-struct Inclusive {
-    double value;
+class Inclusive {
+    double m_value;
 
-    explicit Inclusive(double v) : value{v} {}
+   public:
+    explicit Inclusive(double value) : m_value{value} {}
 
-    [[nodiscard]] auto open_symbol() const -> char { return '['; }
-    [[nodiscard]] auto close_symbol() const -> char { return ']'; }
+    [[nodiscard]] auto value() const noexcept -> double { return m_value; }
 };
 
-struct Exclusive {
-    double value;
+class Exclusive {
+    double m_value;
 
-    explicit Exclusive(double v) : value{v} {}
+   public:
+    explicit Exclusive(double value) : m_value{value} {}
 
-    [[nodiscard]] auto open_symbol() const -> char { return '('; }
-    [[nodiscard]] auto close_symbol() const -> char { return ')'; }
+    [[nodiscard]] auto value() const noexcept -> double { return m_value; }
 };
 
 class Endpoint {
-   private:
     std::variant<Inclusive, Exclusive> m_inner;
 
    public:
@@ -38,7 +37,7 @@ class Endpoint {
     };
 
     [[nodiscard]] auto value() const -> double {
-        return std::visit([](auto x) { return x.value; }, m_inner);
+        return std::visit([](auto x) { return x.value(); }, m_inner);
     }
 
     template <typename T>
@@ -47,11 +46,15 @@ class Endpoint {
     }
 };
 
-struct Interval {
-    Endpoint lower;
-    Endpoint upper;
+class Interval {
+    Endpoint m_lower;
+    Endpoint m_upper;
 
+   public:
     Interval(Endpoint start, Endpoint end);
+
+    [[nodiscard]] auto lower() const noexcept -> Endpoint { return m_lower; }
+    [[nodiscard]] auto upper() const noexcept -> Endpoint { return m_upper; }
 };
 
 class ZeroLengthInterval : std::exception {
