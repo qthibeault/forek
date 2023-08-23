@@ -24,8 +24,8 @@ class Tree {
     explicit Tree(Node node) : m_node{std::move(node)} {}
 
     template <typename T>
-    auto visit(Visitor<T> &v) {
-        return std::visit([&v](const auto &node) { return node.visit(v); }, m_node);
+    auto accept(Visitor<T> &v) {
+        return std::visit([&v](const auto &node) { return node.accept(v); }, m_node);
     }
 };
 }  // namespace forek::ltl

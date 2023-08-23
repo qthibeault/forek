@@ -18,15 +18,11 @@ class Tree {
     Node m_inner;
 
    public:
-    Tree() = delete;
-    Tree(const Tree &) = default;
-    Tree(Tree &&) = default;
-
     explicit Tree(Node node) : m_inner{std::move(node)} {}
 
     template <typename T>
-    auto visit(Visitor<T> &v) -> T {
-        std::visit([&v](auto inner) { return inner.visit(v); }, m_inner);
+    auto accept(Visitor<T> &v) -> T {
+        std::visit([&v](const auto& inner) { return inner.accept(v); }, m_inner);
     }
 };
 }  // namespace forek::mtl
