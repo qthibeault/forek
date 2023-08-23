@@ -30,10 +30,10 @@ class Endpoint {
     Endpoint(Inclusive inner) : m_inner{inner} {}  // NOLINT(google-explicit-constructor)
     Endpoint(Exclusive inner) : m_inner{inner} {}  // NOLINT(google-explicit-constructor)
 
-    template<typename T>
+    template <typename T>
     struct Visitor {
-        virtual auto operator()(const Exclusive&) const -> T = 0;
-        virtual auto operator()(const Inclusive&) const -> T = 0;
+        virtual auto operator()(const Exclusive &) const -> T = 0;
+        virtual auto operator()(const Inclusive &) const -> T = 0;
     };
 
     [[nodiscard]] auto value() const -> double {
@@ -41,8 +41,8 @@ class Endpoint {
     }
 
     template <typename T>
-    [[nodiscard]] auto visit(Visitor<T>& v) const -> T {
-        return std::visit([&v](auto inner){ return v(inner); }, m_inner);
+    [[nodiscard]] auto visit(Visitor<T> &v) const -> T {
+        return std::visit([&v](auto inner) { return v(inner); }, m_inner);
     }
 };
 
@@ -58,8 +58,8 @@ class ZeroLengthInterval : std::exception {
     const std::string m_msg;
 
    public:
-    explicit ZeroLengthInterval(const Interval& interval);
+    explicit ZeroLengthInterval(const Interval &interval);
 
-    [[nodiscard]] auto what() const noexcept -> const char* override { return m_msg.data(); }
+    [[nodiscard]] auto what() const noexcept -> const char * override { return m_msg.data(); }
 };
 }  // namespace forek::interval

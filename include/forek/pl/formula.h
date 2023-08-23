@@ -10,15 +10,15 @@ class Formula {
 
    public:
     Formula() = delete;
-    Formula(const Formula& other) = default;
-    Formula(Formula&& other) = default;
+    Formula(const Formula &other) = default;
+    Formula(Formula &&other) = default;
     ~Formula() = default;
 
     explicit Formula(std::string formula);
     explicit Formula(Tree root);
 
     template <typename T>
-    auto evaluate(forek::pl::Visitor<T>& v) -> T {
+    auto evaluate(forek::pl::Visitor<T> &v) -> T {
         return m_root->visit(v);
     }
 };

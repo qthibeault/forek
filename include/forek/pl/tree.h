@@ -11,20 +11,20 @@ class Tree {
     using Node = std::variant<forek::ir::True, forek::ir::False, forek::ir::Proposition,
                               forek::ir::Negation<Tree>, forek::ir::Conjunction<Tree>,
                               forek::ir::Disjunction<Tree>, forek::ir::Implication<Tree>,
-                              forek::ir::Equivalence<Tree> >;
+                              forek::ir::Equivalence<Tree>>;
 
     Node m_node;
 
    public:
     Tree() = delete;
-    Tree(const Tree& other) = default;
-    Tree(Tree&& other) = default;
+    Tree(const Tree &other) = default;
+    Tree(Tree &&other) = default;
 
     explicit Tree(Node node) : m_node{std::move(node)} {}
 
     template <typename T>
-    auto visit(forek::pl::Visitor<T>& visitor) -> T {
-        return std::visit([&visitor](const auto& node) { return node.visit(visitor); }, m_node);
+    auto visit(forek::pl::Visitor<T> &visitor) -> T {
+        return std::visit([&visitor](const auto &node) { return node.visit(visitor); }, m_node);
     }
 };
 }  // namespace forek::pl

@@ -12,14 +12,14 @@ class Formula {
 
    public:
     Formula() = delete;
-    Formula(const Formula& other) = default;
-    Formula(Formula&& other) = default;
+    Formula(const Formula &other) = default;
+    Formula(Formula &&other) = default;
 
     explicit Formula(std::string formula);
     explicit Formula(Tree root);
 
     template <typename T>
-    auto evaluate(Visitor<T>& v) {
+    auto evaluate(Visitor<T> &v) {
         return m_root->visit(v);
     }
 };
