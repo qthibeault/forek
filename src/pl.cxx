@@ -55,8 +55,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
 
     auto visitPlNegation(PropositionalLogicParser::PlNegationContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto subtree = std::any_cast<Tree>(inner);
-        auto neg = Negation{std::move(subtree)};
+        auto neg = Negation<Tree>{std::any_cast<Tree>(inner)};
 
         return Tree{std::move(neg)};
     }
@@ -65,10 +64,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Conjunction{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Conjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }
@@ -77,10 +73,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto disj = Disjunction{std::move(left_subtree), std::move(right_subtree)};
+        auto disj = Disjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(disj)};
     }
@@ -89,10 +82,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto impl = Implication{std::move(left_subtree), std::move(right_subtree)};
+        auto impl = Implication<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(impl)};
     }
@@ -100,10 +90,7 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
     auto visitPlIff(PropositionalLogicParser::PlIffContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Equivalence{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Equivalence<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }

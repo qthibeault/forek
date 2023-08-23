@@ -61,8 +61,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
 
     auto visitPlNegation(LinearTemporalLogicParser::PlNegationContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto subtree = std::any_cast<Tree>(inner);
-        auto neg = Negation{std::move(subtree)};
+        auto neg = Negation<Tree>{std::any_cast<Tree>(inner)};
 
         return Tree{std::move(neg)};
     }
@@ -71,10 +70,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Conjunction{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Conjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }
@@ -83,10 +79,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Disjunction{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Disjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }
@@ -95,10 +88,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
         -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Implication{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Implication<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }
@@ -106,18 +96,14 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
     auto visitPlIff(LinearTemporalLogicParser::PlIffContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto conj = Equivalence{std::move(left_subtree), std::move(right_subtree)};
+        auto conj = Equivalence<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(conj)};
     }
 
     auto visitLtlAlways(LinearTemporalLogicParser::LtlAlwaysContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto subtree = std::any_cast<Tree>(inner);
-        auto globally = Globally{std::move(subtree)};
+        auto globally = Globally<Tree>{std::any_cast<Tree>(inner)};
 
         return Tree{std::move(globally)};
     }
@@ -125,16 +111,14 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
     auto visitLtlEventually(LinearTemporalLogicParser::LtlEventuallyContext *ctx)
         -> std::any override {
         auto inner = visit(ctx->formula());
-        auto subtree = std::any_cast<Tree>(inner);
-        auto finally = Finally{std::move(subtree)};
+        auto finally = Finally<Tree>{std::any_cast<Tree>(inner)};
 
         return Tree{std::move(finally)};
     }
 
     auto visitLtlNext(LinearTemporalLogicParser::LtlNextContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto subtree = std::any_cast<Tree>(inner);
-        auto next = Next{std::move(subtree)};
+        auto next = Next<Tree>{std::any_cast<Tree>(inner)};
 
         return Tree{std::move(next)};
     }
@@ -142,10 +126,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
     auto visitLtlRelease(LinearTemporalLogicParser::LtlReleaseContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto release = Release{std::move(left_subtree), std::move(right_subtree)};
+        auto release = Release<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(release)};
     }
@@ -153,10 +134,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
     auto visitLtlUntil(LinearTemporalLogicParser::LtlUntilContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-
-        auto left_subtree = std::any_cast<Tree>(left);
-        auto right_subtree = std::any_cast<Tree>(right);
-        auto release = Until{std::move(left_subtree), std::move(right_subtree)};
+        auto release = Until<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
 
         return Tree{std::move(release)};
     }
