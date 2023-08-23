@@ -11,12 +11,12 @@ using forek::interval::ZeroLengthInterval;
 
 struct OpenSymbolVisitor : public Endpoint::Visitor<char> {
     auto operator()(const Exclusive &) const -> char override { return '('; }
-    auto operator()(const Inclusive &) const -> char override { return '('; }
+    auto operator()(const Inclusive &) const -> char override { return '['; }
 };
 
 struct CloseSymbolVisitor : public Endpoint::Visitor<char> {
     auto operator()(const Exclusive &) const -> char override { return ')'; }
-    auto operator()(const Inclusive &) const -> char override { return ')'; }
+    auto operator()(const Inclusive &) const -> char override { return ']'; }
 };
 
 Interval::Interval(Endpoint lower, Endpoint upper)
