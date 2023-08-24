@@ -196,9 +196,8 @@ Formula::Formula(std::string formula) {
     auto parser = MetricTemporalLogicParser(&token_stream);
     auto builder = Builder{};
     auto output = builder.visit(parser.start());
-    auto root = std::any_cast<Tree>(output);
 
-    this->m_root = std::make_shared<Tree>(std::move(root));
+    this->m_root = std::any_cast<TreePtr>(output);
 }
 
 Formula::Formula(Tree root) { this->m_root = std::make_shared<Tree>(std::move(root)); }
