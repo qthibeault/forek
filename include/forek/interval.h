@@ -32,8 +32,16 @@ class Endpoint {
 
     template <typename T>
     struct Visitor {
+        Visitor() = default;
+        Visitor(const Visitor&) = default;
+        Visitor(Visitor&&) = default;
+
+        auto operator=(const Visitor&) -> Visitor& = default;
+        auto operator=(Visitor&&) -> Visitor& = default;
+
         virtual auto operator()(const Exclusive &) const -> T = 0;
         virtual auto operator()(const Inclusive &) const -> T = 0;
+        virtual ~Visitor() = default;
     };
 
     [[nodiscard]] auto value() const -> double {
