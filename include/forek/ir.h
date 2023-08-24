@@ -62,7 +62,7 @@ template <typename Subtree>
 struct Unary {
     std::shared_ptr<Subtree> m_inner{nullptr};
 
-    explicit Unary(Subtree inner) { m_inner = std::make_shared<Subtree>(std::move(inner)); }
+    explicit Unary(Subtree inner) : m_inner{std::make_shared<Subtree>(std::move(inner))} {}
     explicit Unary(std::shared_ptr<Subtree> inner) : m_inner{std::move(inner)} {}
 };
 
@@ -81,10 +81,7 @@ struct Binary {
     std::shared_ptr<Subtree> m_left{nullptr};
     std::shared_ptr<Subtree> m_right{nullptr};
 
-    Binary(Subtree left, Subtree right) {
-        m_left = std::make_shared<Subtree>(std::move(left));
-        m_right = std::make_shared<Subtree>(std::move(right));
-    }
+    Binary(Subtree left, Subtree right) : m_left{std::make_shared<Subtree>(std::move(left))}, m_right{std::make_shared<Subtree>(std::move(right))} {}
 
     Binary(std::shared_ptr<Subtree> left, std::shared_ptr<Subtree> right)
         : m_left{std::move(left)}, m_right{std::move(right)} {}
