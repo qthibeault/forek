@@ -20,7 +20,7 @@ struct CloseSymbolVisitor : public Endpoint::Visitor<char> {
 };
 
 Interval::Interval(Endpoint lower, Endpoint upper)
-    : lower{std::move(lower)}, upper{std::move(upper)} {
+    : m_lower{std::move(lower)}, m_upper{std::move(upper)} {
     if (lower.value() >= upper.value()) {
         throw ZeroLengthInterval{*this};
     }
@@ -36,28 +36,16 @@ struct fmt::formatter<Interval> {
     template <typename FormatContext>
     auto format(const Interval &i, FormatContext &ctx) {
         auto open_visitor = OpenSymbolVisitor{};
-        auto open = i.lower.visit(open_visitor);
-        auto start = i.lower.value();
+        auto open = i.lower().visit(open_visitor);
+        auto start = i.lower().value();
 
         auto close_visitor = CloseSymbolVisitor{};
-        auto close = i.upper.visit(close_visitor);
-        auto end = i.upper.value();
+        auto close = i.upper().visit(close_visitor);
+        auto end = i.upper().value();
 
         return fmt::format_to(ctx.out(), "{}{},{}{}", open, start, end, close);
     }
 };
-
-auto interval_string(const Interval &i) -> std::string {
-    auto open_visitor = OpenSymbolVisitor{};
-    auto open = i.lower.visit(open_visitor);
-    auto start = i.lower.value();
-
-    auto close_visitor = CloseSymbolVisitor{};
-    auto close = i.upper.visit(close_visitor);
-    auto end = i.upper.value();
-
-    return fmt::format("{}{},{}{}", open, start, end, close);
-}
 
 ZeroLengthInterval::ZeroLengthInterval(const Interval &i)
     : m_msg{fmt::format("Interval {} has a length of zero", i)} {}
