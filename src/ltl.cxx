@@ -1,7 +1,7 @@
 #include <any>
 #include <string>
 
-#include "forek/ir.h"
+#include "forek/ltl/ir.h"
 #include "forek/ltl/formula.h"
 #include "forek/ltl/tree.h"
 

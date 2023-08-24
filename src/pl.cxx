@@ -1,6 +1,6 @@
 #include <string>
 
-#include "forek/ir.h"
+#include "forek/pl/ir.h"
 #include "forek/pl/formula.h"
 #include "forek/pl/tree.h"
 

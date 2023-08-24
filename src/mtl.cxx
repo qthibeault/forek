@@ -2,7 +2,7 @@
 #include <string>
 
 #include "forek/interval.h"
-#include "forek/ir.h"
+#include "forek/mtl/ir.h"
 #include "forek/mtl/formula.h"
 #include "forek/mtl/tree.h"
 
