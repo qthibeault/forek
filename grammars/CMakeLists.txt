@@ -31,7 +31,7 @@ function(PARSER grammar_name)
         ${ANTLR_${LEXER}_CXX_OUTPUTS} ${ANTLR_${PARSER}_CXX_OUTPUTS})
 
     target_include_directories(${LIBRARY_NAME} PUBLIC
-        ${ANTLR4_INCLUDE_DIRS}
+        ${antlr4_SOURCE_DIR}/runtime/Cpp/runtime/src
         ${ANTLR_${LEXER}_OUTPUT_DIR}
         ${ANTLR_${PARSER}_OUTPUT_DIR})
 

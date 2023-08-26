@@ -7,7 +7,7 @@ project(forek
   LANGUAGES CXX
 )
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
 
 # Disable vender-specific plugins by default.
@@ -20,7 +20,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-include(ExternalAntlr4Cpp)
+# include(ExternalAntlr4Cpp)
 include(FetchAntlrJar)
 
 # Locate ANTLR jar file
@@ -32,8 +32,14 @@ FetchContent_Declare(fmtlib
     GIT_REPOSITORY https://github.com/fmtlib/fmt
     GIT_TAG 10.1.0)
 
-FetchContent_MakeAvailable(fmtlib)
+# Download ANTLR4 library
+FetchContent_Declare(antlr4
+    GIT_REPOSITORY https://github.com/antlr/antlr4
+    GIT_TAG 4.13.0)
 
+FetchContent_MakeAvailable(fmtlib antlr4)
+
+add_subdirectory(${antlr4_SOURCE_DIR}/runtime/Cpp)
 add_subdirectory(grammars)
 
 add_library(forek STATIC
