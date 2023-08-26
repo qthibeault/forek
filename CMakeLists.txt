@@ -18,8 +18,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Generate compile_commands.json for editor tooling support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # include(ExternalAntlr4Cpp)
 include(FetchAntlrJar)
 
@@ -39,7 +39,9 @@ FetchContent_Declare(antlr4
 
 FetchContent_MakeAvailable(fmtlib antlr4)
 
+list(APPEND CMAKE_MODULE_PATH ${antlr4_SOURCE_DIR}/runtime/Cpp/cmake)
 add_subdirectory(${antlr4_SOURCE_DIR}/runtime/Cpp)
+
 add_subdirectory(grammars)
 
 add_library(forek STATIC
