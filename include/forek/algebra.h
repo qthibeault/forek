@@ -1,34 +1,186 @@
 #pragma once
 
+#include <initializer_list>
+#include <memory>
 #include <optional>
-#include <span>
+#include <stdexcept>
 #include <string>
+#include <unordered_map>
+#include <utility>
+#include <variant>
 #include <vector>
 
 namespace forek::algebra {
-
-class Term {
-    double m_scalar;
-    std::optional<std::string> m_name;
+class Literal {
+    double m_value;
 
    public:
-    Term(std::string name, double scalar) : m_scalar{scalar}, m_name{std::move(name)} {}
-    Term(double scalar, std::string name) : m_scalar{scalar}, m_name{std::move(name)} {}
-    explicit Term(double scalar) : m_scalar{scalar}, m_name{std::nullopt} {}
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_value(m_value);
+    }
+};
 
-    auto scalar() -> double { return m_scalar; }
-    auto name() -> std::optional<std::string>& { return m_name; }
+class Variable {
+    std::string m_name;
+
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_value(m_name);
+    }
+};
+
+template <typename Subtree>
+class Operator {
+   protected:
+    std::shared_ptr<Subtree> m_lhs;
+    std::shared_ptr<Subtree> m_rhs;
+
+   public:
+    [[nodiscard]] auto lhs() const noexcept -> const Subtree& { return *m_lhs; }
+    [[nodiscard]] auto rhs() const noexcept -> const Subtree& { return *m_rhs; }
+};
+
+template <typename Subtree>
+class Add : public Operator<Subtree> {
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_addition(this->m_lhs->evaluate(visitor),
+                                      this->m_rhs->evaluate(visitor));
+    }
+};
+
+template <typename Subtree>
+class Sub : public Operator<Subtree> {
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_subtraction(this->m_lhs->evaluate(visitor),
+                                         this->m_rhs->evaluate(visitor));
+    }
+};
+
+template <typename Subtree>
+class Mult : public Operator<Subtree> {
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_multiplication(this->m_lhs->evaluate(visitor),
+                                            this->m_rhs->evaluate(visitor));
+    }
+};
+
+template <typename Subtree>
+class Div : public Operator<Subtree> {
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_division(this->m_lhs->evaluate(visitor),
+                                            this->m_rhs->evaluate(visitor));
+    }
+};
+
+template <typename Subtree>
+class Mod : public Operator<Subtree> {
+   public:
+    template <typename V>
+    auto accept(V& visitor) const {
+        return visitor.visit_modulo(this->m_lhs->evaluate(visitor),
+                                            this->m_rhs->evaluate(visitor));
+    }
+};
+
+template <typename T>
+class Visitor {
+    virtual auto visit_value(double value) -> T = 0;
+    virtual auto visit_variable(std::string name) -> T = 0;
+    virtual auto visit_addition(T lhs, T rhs) -> T = 0;
+    virtual auto visit_subtraction(T lhs, T rhs) -> T = 0;
+    virtual auto visit_multiplication(T lhs, T rhs) -> T = 0;
+    virtual auto visit_division(T lhs, T rhs) -> T = 0;
+    virtual auto visit_modulo(T lhs, T rhs) -> T = 0;
+};
+
+enum class Comparison { GreaterThan, GreaterThanEqual, LessThanEqual, LessThan };
+
+class Expr {
+    using Node =
+        std::variant<Literal, Variable, Add<Expr>, Sub<Expr>, Mult<Expr>, Div<Expr>, Mod<Expr>>;
+
+    Node m_node;
+
+   public:
+    explicit Expr(Node node) : m_node{std::move(node)} {}
+
+    template <typename T>
+    auto evaluate(Visitor<T>& v) const -> T {
+        return std::visit([&v](const auto& node) { return node.accept(v); }, m_node);
+    }
+
+    template <typename T>
+    [[nodiscard]] auto is_type() const -> bool {
+        return std::holds_alternative<T>(m_node);
+    }
+
+    template <template <typename> typename T>
+    [[nodiscard]] auto is_type() const -> bool {
+        return std::holds_alternative<T<Expr>>(m_node);
+    }
+
+    [[nodiscard]] auto is_value() const -> bool {
+        return is_type<Literal>() || is_type<Variable>();
+    }
+
+    [[nodiscard]] auto is_operator() const -> bool {
+        return is_type<Add>() || is_type<Sub>() || is_type<Mult>() || is_type<Div>() ||
+               is_type<Mod>();
+    }
 };
 
 class Sum {
-    std::vector<Term> m_terms;
+    struct Term {
+        double m_scalar;
+        std::optional<std::string> m_name;
+
+        Term(double scalar)  // NOLINT: google-explicit-constructors
+            : m_scalar{scalar}, m_name{std::nullopt} {}
+
+        Term(std::string name)  // NOLINT: google-explicit-constructors
+            : m_name{std::move(name)}, m_scalar{1.0} {}
+
+        Term(double scalar, std::string name) : m_scalar{scalar}, m_name{std::move(name)} {}
+        Term(std::string name, double scalar) : m_scalar{scalar}, m_name{std::move(name)} {}
+    };
+
+    struct Terms {
+        std::vector<std::pair<std::string, double>> coefficients;
+        double constant;
+    };
+
+    double m_constant;
+    std::unordered_map<std::string, double> m_coefficients;
 
    public:
-    explicit Sum(std::vector<Term> terms) : m_terms{std::move(terms)} {}
+    Sum();
+    Sum(std::initializer_list<Term>);
 
-    [[nodiscard]] auto terms() const -> std::span<const Term> { return {m_terms}; }
+    explicit Sum(Term term);
+
+    auto operator+=(const Sum& lhs) -> Sum&;
+    auto operator-=(const Sum& lhs) -> Sum&;
+    auto operator*=(double scalar) -> Sum&;
+
+    auto add_term(const std::string& variable, double coefficient) -> Sum&;
+    auto add_term(double constant) -> Sum&;
+
+    [[nodiscard]] auto has_coefficients() const -> bool { return m_coefficients.size() > 0; }
+    [[nodiscard]] auto has_constant() const -> bool { return m_constant != 0.0; }
+    [[nodiscard]] auto coefficients() const -> std::vector<std::pair<std::string, double>>;
+    [[nodiscard]] auto constant() const -> double;
 };
 
-enum class Comparison { GreaterThan, GreaterThenEquals, LessThan, LessThanEquals };
-
+class UnsupportedOperationException : std::exception {};
+auto canonical_sum(const Expr& expr) -> Sum;
 }  // namespace forek::algebra
