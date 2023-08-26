@@ -33,11 +33,11 @@ class Endpoint {
     template <typename T>
     struct Visitor {
         Visitor() = default;
-        Visitor(const Visitor&) = default;
-        Visitor(Visitor&&) = default;
+        Visitor(const Visitor &) = default;
+        Visitor(Visitor &&) = default;
 
-        auto operator=(const Visitor&) -> Visitor& = default;
-        auto operator=(Visitor&&) -> Visitor& = default;
+        auto operator=(const Visitor &) -> Visitor & = default;
+        auto operator=(Visitor &&) -> Visitor & = default;
 
         virtual auto operator()(const Exclusive &) const -> T = 0;
         virtual auto operator()(const Inclusive &) const -> T = 0;
@@ -53,6 +53,9 @@ class Endpoint {
         return std::visit([&v](auto inner) { return v(inner); }, m_inner);
     }
 };
+
+auto make_inclusive(double value) -> Endpoint { return {Inclusive{value}}; }
+auto make_exclusive(double value) -> Endpoint { return {Exclusive{value}}; }
 
 class Interval {
     Endpoint m_lower;
