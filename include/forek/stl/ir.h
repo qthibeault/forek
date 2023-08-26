@@ -1,27 +1,31 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
+#include <variant>
 #include <vector>
 
 #include "forek/algebra.h"
 #include "forek/mtl/ir.h"
 
+
 namespace forek::ir {
 struct Predicate {
-    using Sum = algebra::Sum;
+    using Expr = algebra::Expr;
     using Comparison = algebra::Comparison;
 
-    Sum m_left;
+    Expr m_left;
     Comparison m_cmp;
-    Sum m_right;
+    Expr m_right;
 
-    Predicate(Sum left, Comparison cmp, Sum right)
+    Predicate(Expr left, Comparison cmp, Expr right)
         : m_left{std::move(left)}, m_cmp{cmp}, m_right{std::move(right)} {}
 
     template <typename V>
     auto accept(V& visitor) const -> decltype(auto) {
-        visitor.visit_predicate(m_left.terms(), m_cmp, m_right.terms());
+        visitor.visit_predicate(m_left, m_cmp, m_right);
     }
 };
 }  // namespace forek::ir
