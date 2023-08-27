@@ -1,0 +1,4 @@
+
+---
+Checks:          '-cert-err58-cpp,-cppcoreguidelines-avoid-do-while'
+InheritParentConfig: true
