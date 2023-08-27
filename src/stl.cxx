@@ -1,5 +1,8 @@
+#include <memory>
+
 #include "forek/algebra.h"
 #include "forek/interval.h"
+#include "forek/pl/ir.h"
 #include "forek/stl/formula.h"
 #include "forek/stl/ir.h"
 #include "forek/stl/tree.h"
@@ -13,6 +16,15 @@
 using forek::SignalTemporalLogicLexer;
 using forek::SignalTemporalLogicParser;
 using forek::SignalTemporalLogicParserBaseVisitor;
+using forek::algebra::Add;
+using forek::algebra::Comparison;
+using forek::algebra::Div;
+using forek::algebra::Expr;
+using forek::algebra::Literal;
+using forek::algebra::Mod;
+using forek::algebra::Mult;
+using forek::algebra::Sub;
+using forek::algebra::Variable;
 using forek::interval::Interval;
 using forek::interval::make_exclusive;
 using forek::interval::make_inclusive;
@@ -38,6 +50,7 @@ using forek::stl::Formula;
 using forek::stl::Tree;
 
 using TreePtr = std::shared_ptr<Tree>;
+using ExprPtr = std::shared_ptr<Expr>;
 
 template <size_t N>
 auto parse_interval_value(SignalTemporalLogicParser::IntervalContext *ctx) -> double {
@@ -48,6 +61,7 @@ auto parse_interval_value(SignalTemporalLogicParser::IntervalContext *ctx) -> do
 class Builder : public SignalTemporalLogicParserBaseVisitor {
     using Parser = SignalTemporalLogicParser;
 
+   public:
     auto visitStart(Parser::StartContext *ctx) -> std::any override {
         return visit(ctx->formula());
     }
@@ -65,63 +79,217 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
         return Interval{lower, upper};
     }
 
-    auto visitArithmeticParentheses(Parser::ArithmeticParenthesesContext *ctx) -> std::any override {
+    auto visitArithmeticParentheses(Parser::ArithmeticParenthesesContext *ctx)
+        -> std::any override {
         return visit(ctx->expression());
     }
 
-    virtual std::any visitArithmeticTerm(
-        SignalTemporalLogicParser::ArithmeticTermContext *context) = 0;
+    auto visitArithmeticTerm(Parser::ArithmeticTermContext *ctx) -> std::any override {
+        return visit(ctx->term());
+    }
 
-    virtual std::any visitArithmeticPlus(
-        SignalTemporalLogicParser::ArithmeticPlusContext *context) = 0;
+    auto visitArithmeticPlus(Parser::ArithmeticPlusContext *ctx) -> std::any override {
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
 
-    virtual std::any visitArithmeticVariable(
-        SignalTemporalLogicParser::ArithmeticVariableContext *context) = 0;
+        return std::make_shared<Expr>(
+            Add<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+    }
 
-    virtual std::any visitArithmeticConstant(
-        SignalTemporalLogicParser::ArithmeticConstantContext *context) = 0;
+    auto visitArithmeticMinus(Parser::ArithmeticMinusContext *ctx) -> std::any override {
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
 
-    virtual std::any visitRelationalOperator(
-        SignalTemporalLogicParser::RelationalOperatorContext *context) = 0;
+        return std::make_shared<Expr>(
+            Sub<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+    }
 
-    virtual std::any visitPredicate(SignalTemporalLogicParser::PredicateContext *context) = 0;
+    auto visitArithmeticTimes(Parser::ArithmeticTimesContext *ctx) -> std::any override {
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
 
-    virtual std::any visitProposition(SignalTemporalLogicParser::PropositionContext *context) = 0;
+        return std::make_shared<Expr>(
+            Mult<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+    }
+    
+    auto visitArithmeticDivide(Parser::ArithmeticDivideContext *ctx) -> std::any override {
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
 
-    virtual std::any visitPlTrue(SignalTemporalLogicParser::PlTrueContext *context) = 0;
+        return std::make_shared<Expr>(
+            Div<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+    }
 
-    virtual std::any visitPlFalse(SignalTemporalLogicParser::PlFalseContext *context) = 0;
+    auto visitArithmeticModulus(Parser::ArithmeticModulusContext *ctx) -> std::any override {
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
 
-    virtual std::any visitPlProposition(
-        SignalTemporalLogicParser::PlPropositionContext *context) = 0;
+        return std::make_shared<Expr>(
+            Mod<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+    }
 
-    virtual std::any visitStlPredicate(SignalTemporalLogicParser::StlPredicateContext *context) = 0;
+    auto visitArithmeticVariable(Parser::ArithmeticVariableContext *ctx) -> std::any override {
+        return std::make_shared<Expr>(Variable{ctx->Identifier()->getText()});
+    }
+
+    auto visitArithmeticConstant(Parser::ArithmeticConstantContext *ctx) -> std::any override {
+        return std::make_shared<Expr>(Literal{std::stod(ctx->Scalar()->getText())});
+    }
+
+    auto visitRelationalOperator(Parser::RelationalOperatorContext *ctx) -> std::any override {
+        auto raw = ctx->getText();
+
+        if (raw == "<") {
+            return Comparison::LessThan;
+        }
+        if (raw == "<=") {
+            return Comparison::LessThanEqual;
+        }
+        if (raw == "==") {
+            return Comparison::Equal;
+        }
+        if (raw == ">=") {
+            return Comparison::GreaterThanEqual;
+        }
+        if (raw == ">") {
+            return Comparison::GreaterThan;
+        }
+        if (raw == "!=") {
+            return Comparison::NotEqual;
+        }
+
+        throw std::runtime_error{"Unknown comparison operator"};
+    }
+
+    auto visitPredicate(Parser::PredicateContext *ctx) -> std::any override {
+        auto op = visit(ctx->relationalOperator());
+        auto left = visit(ctx->expression(0));
+        auto right = visit(ctx->expression(1));
+
+        return std::make_shared<Tree>(Predicate{std::any_cast<ExprPtr>(left),
+                                                std::any_cast<Comparison>(op),
+                                                std::any_cast<ExprPtr>(right)});
+    }
+
+    auto visitProposition(Parser::PropositionContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(Proposition{ctx->Identifier()->getText()});
+    }
+
+    auto visitPlTrue(Parser::PlTrueContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(True{});
+    }
+
+    auto visitPlFalse(Parser::PlFalseContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(False{});
+    }
+
+    auto visitPlProposition(Parser::PlPropositionContext *ctx) -> std::any override {
+        return visit(ctx->proposition());
+    }
+
+    auto visitStlPredicate(Parser::StlPredicateContext *ctx) -> std::any override {
+        return visit(ctx->predicate());
+    }
 
     auto visitPlNegation(SignalTemporalLogicParser::PlNegationContext *ctx) -> std::any override {
         return nullptr;
     }
 
-    virtual std::any visitPlConjunction(
-        SignalTemporalLogicParser::PlConjunctionContext *context) = 0;
+    auto visitPlConjunction(Parser::PlConjunctionContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
 
-    virtual std::any visitPlDisjunction(
-        SignalTemporalLogicParser::PlDisjunctionContext *context) = 0;
+        return std::make_shared<Tree>(
+            Conjunction<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
 
-    virtual std::any visitPlImplication(
-        SignalTemporalLogicParser::PlImplicationContext *context) = 0;
+    auto visitPlDisjunction(Parser::PlDisjunctionContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
 
-    virtual std::any visitPlIff(SignalTemporalLogicParser::PlIffContext *context) = 0;
+        return std::make_shared<Tree>(
+            Disjunction<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
 
-    virtual std::any visitLtlUntil(SignalTemporalLogicParser::LtlUntilContext *context) = 0;
+    auto visitPlImplication(Parser::PlImplicationContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
 
-    virtual std::any visitLtlAlways(SignalTemporalLogicParser::LtlAlwaysContext *context) = 0;
+        return std::make_shared<Tree>(
+            Implication<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
 
-    virtual std::any visitLtlRelease(SignalTemporalLogicParser::LtlReleaseContext *context) = 0;
+    auto visitPlIff(Parser::PlIffContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
 
-    virtual std::any visitLtlEventually(
-        SignalTemporalLogicParser::LtlEventuallyContext *context) = 0;
+        return std::make_shared<Tree>(
+            Equivalence<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
 
-    virtual std::any visitLtlNext(SignalTemporalLogicParser::LtlNextContext *context) = 0;
+    auto visitLtlNext(Parser::LtlNextContext *ctx) -> std::any override { return nullptr; }
+
+    auto visitLtlAlways(Parser::LtlAlwaysContext *ctx) -> std::any override {
+        auto inner = visit(ctx->formula());
+        auto p_interval = ctx->interval();
+
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedGlobally<Tree>{std::any_cast<Interval>(interval),
+                                                                std::any_cast<TreePtr>(inner)});
+        }
+
+        return std::make_shared<Tree>(Globally<Tree>{std::any_cast<TreePtr>(inner)});
+    }
+
+    auto visitLtlEventually(Parser::LtlEventuallyContext *ctx) -> std::any override {
+        auto inner = visit(ctx->formula());
+        auto p_interval = ctx->interval();
+
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedFinally<Tree>{std::any_cast<Interval>(interval),
+                                                               std::any_cast<TreePtr>(inner)});
+        }
+
+        return std::make_shared<Tree>(Finally<Tree>{std::any_cast<TreePtr>(inner)});
+    }
+
+    auto visitLtlUntil(Parser::LtlUntilContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
+        auto p_interval = ctx->interval();
+
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedUntil<Tree>{std::any_cast<Interval>(interval),
+                                                             std::any_cast<TreePtr>(left),
+                                                             std::any_cast<TreePtr>(right)});
+        }
+
+        return std::make_shared<Tree>(
+            Until<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
+
+    auto visitLtlRelease(Parser::LtlReleaseContext *ctx) -> std::any override {
+        auto left = visit(ctx->formula(0));
+        auto right = visit(ctx->formula(1));
+        auto p_interval = ctx->interval();
+
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedRelease<Tree>{std::any_cast<Interval>(interval),
+                                                             std::any_cast<TreePtr>(left),
+                                                             std::any_cast<TreePtr>(right)});
+        }
+
+        return std::make_shared<Tree>(
+            Release<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+    }
 };
 
 auto parse_formula(std::string formula) -> TreePtr {
