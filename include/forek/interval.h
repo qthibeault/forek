@@ -54,9 +54,6 @@ class Endpoint {
     }
 };
 
-auto make_inclusive(double value) -> Endpoint { return {Inclusive{value}}; }
-auto make_exclusive(double value) -> Endpoint { return {Exclusive{value}}; }
-
 class Interval {
     Endpoint m_lower;
     Endpoint m_upper;
@@ -77,4 +74,7 @@ class ZeroLengthInterval : std::exception {
 
     [[nodiscard]] auto what() const noexcept -> const char * override { return m_msg.data(); }
 };
+
+auto make_inclusive(double value) -> Endpoint;
+auto make_exclusive(double value) -> Endpoint;
 }  // namespace forek::interval

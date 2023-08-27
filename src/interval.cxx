@@ -49,3 +49,6 @@ struct fmt::formatter<Interval> {
 
 ZeroLengthInterval::ZeroLengthInterval(const Interval &i)
     : m_msg{fmt::format("Interval {} has a length of zero", i)} {}
+
+auto forek::interval::make_inclusive(double value) -> Endpoint { return {Inclusive{value}}; }
+auto forek::interval::make_exclusive(double value) -> Endpoint { return {Exclusive{value}}; }
