@@ -1,6 +1,8 @@
 #include <any>
 #include <string>
+#include <valarray>
 
+#include "common.h"
 #include "forek/ltl/ir.h"
 #include "forek/ltl/formula.h"
 #include "forek/ltl/tree.h"
@@ -14,6 +16,8 @@
 using forek::LinearTemporalLogicLexer;
 using forek::LinearTemporalLogicParser;
 using forek::LinearTemporalLogicParserVisitor;
+using forek::common::make_unary;
+using forek::common::make_binary;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -31,125 +35,86 @@ using forek::ltl::Formula;
 using forek::ltl::Tree;
 
 class FormulaBuilder : public LinearTemporalLogicParserVisitor {
-    auto visitStart(LinearTemporalLogicParser::StartContext *ctx) -> std::any override {
+    using Parser = LinearTemporalLogicParser;
+
+    auto visitStart(Parser::StartContext *ctx) -> std::any override {
         return visit(ctx->formula());
     }
 
-    auto visitParentheses(LinearTemporalLogicParser::ParenthesesContext *ctx) -> std::any override {
+    auto visitParentheses(Parser::ParenthesesContext *ctx) -> std::any override {
         return visit(ctx->formula());
     }
 
-    auto visitPlTrue(LinearTemporalLogicParser::PlTrueContext *ctx) -> std::any override {
-        return Tree{True{}};
+    auto visitPlTrue(Parser::PlTrueContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(True{});
     }
 
-    auto visitPlFalse(LinearTemporalLogicParser::PlFalseContext *ctx) -> std::any override {
-        return Tree{False{}};
+    auto visitPlFalse(Parser::PlFalseContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(False{});
     }
 
-    auto visitProposition(LinearTemporalLogicParser::PropositionContext *ctx) -> std::any override {
-        auto name = ctx->Identifier()->getText();
-        auto prop = Proposition{std::move(name)};
-
-        return Tree{std::move(prop)};
+    auto visitProposition(Parser::PropositionContext *ctx) -> std::any override {
+        return std::make_shared<Tree>(Proposition{ctx->Identifier()->getText()});
     }
 
-    auto visitPlProposition(LinearTemporalLogicParser::PlPropositionContext *ctx)
-        -> std::any override {
+    auto visitPlProposition(Parser::PlPropositionContext *ctx) -> std::any override {
         return visit(ctx->proposition());
     }
 
-    auto visitPlNegation(LinearTemporalLogicParser::PlNegationContext *ctx) -> std::any override {
-        auto inner = visit(ctx->formula());
-        auto neg = Negation<Tree>{std::any_cast<Tree>(inner)};
-
-        return Tree{std::move(neg)};
+    auto visitPlNegation(Parser::PlNegationContext *ctx) -> std::any override {
+        return make_unary<Negation, Tree>(visit(ctx->formula()));
     }
 
-    auto visitPlConjunction(LinearTemporalLogicParser::PlConjunctionContext *ctx)
+    auto visitPlConjunction(Parser::PlConjunctionContext *ctx) -> std::any override {
+        return make_binary<Conjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
+    }
+
+    auto visitPlDisjunction(Parser::PlDisjunctionContext *ctx)
         -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto conj = Conjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(conj)};
+        return make_binary<Disjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
-    auto visitPlDisjunction(LinearTemporalLogicParser::PlDisjunctionContext *ctx)
+    auto visitPlImplication(Parser::PlImplicationContext *ctx)
         -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto conj = Disjunction<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(conj)};
+        return make_binary<Implication, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
-    auto visitPlImplication(LinearTemporalLogicParser::PlImplicationContext *ctx)
+    auto visitPlIff(Parser::PlIffContext *ctx) -> std::any override {
+        return make_binary<Equivalence, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
+    }
+
+    auto visitLtlAlways(Parser::LtlAlwaysContext *ctx) -> std::any override {
+        return make_unary<Globally, Tree>(visit(ctx->formula()));
+    }
+
+    auto visitLtlEventually(Parser::LtlEventuallyContext *ctx)
         -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto conj = Implication<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(conj)};
+        return make_unary<Finally, Tree>(visit(ctx->formula()));
     }
 
-    auto visitPlIff(LinearTemporalLogicParser::PlIffContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto conj = Equivalence<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(conj)};
+    auto visitLtlNext(Parser::LtlNextContext *ctx) -> std::any override {
+        return make_unary<Next, Tree>(visit(ctx->formula()));
     }
 
-    auto visitLtlAlways(LinearTemporalLogicParser::LtlAlwaysContext *ctx) -> std::any override {
-        auto inner = visit(ctx->formula());
-        auto globally = Globally<Tree>{std::any_cast<Tree>(inner)};
-
-        return Tree{std::move(globally)};
+    auto visitLtlRelease(Parser::LtlReleaseContext *ctx) -> std::any override {
+        return make_binary<Release, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
-    auto visitLtlEventually(LinearTemporalLogicParser::LtlEventuallyContext *ctx)
-        -> std::any override {
-        auto inner = visit(ctx->formula());
-        auto finally = Finally<Tree>{std::any_cast<Tree>(inner)};
-
-        return Tree{std::move(finally)};
-    }
-
-    auto visitLtlNext(LinearTemporalLogicParser::LtlNextContext *ctx) -> std::any override {
-        auto inner = visit(ctx->formula());
-        auto next = Next<Tree>{std::any_cast<Tree>(inner)};
-
-        return Tree{std::move(next)};
-    }
-
-    auto visitLtlRelease(LinearTemporalLogicParser::LtlReleaseContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto release = Release<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(release)};
-    }
-
-    auto visitLtlUntil(LinearTemporalLogicParser::LtlUntilContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-        auto release = Until<Tree>{std::any_cast<Tree>(left), std::any_cast<Tree>(right)};
-
-        return Tree{std::move(release)};
+    auto visitLtlUntil(Parser::LtlUntilContext *ctx) -> std::any override {
+        return make_binary<Until, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 };
 
-Formula::Formula(std::string formula) {
+auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = LinearTemporalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = LinearTemporalLogicParser(&token_stream);
     auto builder = FormulaBuilder{};
     auto output = builder.visit(parser.start());
-    auto root = std::any_cast<Tree>(output);
 
-    this->m_root = std::make_shared<Tree>(std::move(root));
+    return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(Tree root) { this->m_root = std::make_shared<Tree>(std::move(root)); }
+Formula::Formula(std::string formula) : m_root{parse_formula(std::move(formula))} {}
+Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
