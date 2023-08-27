@@ -2,7 +2,7 @@
 
 #include <variant>
 
-#include "forek/ir.h"
+#include "forek/stl/ir.h"
 #include "forek/stl/visitor.h"
 
 namespace forek::stl {

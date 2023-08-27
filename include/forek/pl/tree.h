@@ -3,7 +3,7 @@
 #include <utility>
 #include <variant>
 
-#include "forek/ir.h"
+#include "forek/pl/ir.h"
 #include "forek/pl/visitor.h"
 
 namespace forek::pl {

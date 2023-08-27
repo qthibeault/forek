@@ -3,7 +3,7 @@
 #include <memory>
 #include <variant>
 
-#include "forek/ir.h"
+#include "forek/ltl/ir.h"
 #include "forek/ltl/visitor.h"
 
 namespace forek::ltl {
