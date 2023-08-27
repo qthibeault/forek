@@ -13,7 +13,8 @@ class Tree {
                      ir::Conjunction<Tree>, ir::Disjunction<Tree>, ir::Implication<Tree>,
                      ir::Equivalence<Tree>, ir::Globally<Tree>, ir::Finally<Tree>, ir::Next<Tree>,
                      ir::Release<Tree>, ir::Until<Tree>, ir::BoundedGlobally<Tree>,
-                     ir::BoundedFinally<Tree>, ir::BoundedRelease<Tree>, ir::BoundedUntil<Tree>>;
+                     ir::BoundedFinally<Tree>, ir::BoundedNext<Tree>, ir::BoundedRelease<Tree>,
+                     ir::BoundedUntil<Tree>>;
 
     Node m_node;
 

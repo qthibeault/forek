@@ -30,6 +30,7 @@ using forek::interval::make_exclusive;
 using forek::interval::make_inclusive;
 using forek::ir::BoundedFinally;
 using forek::ir::BoundedGlobally;
+using forek::ir::BoundedNext;
 using forek::ir::BoundedRelease;
 using forek::ir::BoundedUntil;
 using forek::ir::Conjunction;
@@ -111,7 +112,7 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
         return std::make_shared<Expr>(
             Mult<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
     }
-    
+
     auto visitArithmeticDivide(Parser::ArithmeticDivideContext *ctx) -> std::any override {
         auto left = visit(ctx->expression(0));
         auto right = visit(ctx->expression(1));
@@ -227,7 +228,19 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
             Equivalence<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
     }
 
-    auto visitLtlNext(Parser::LtlNextContext *ctx) -> std::any override { return nullptr; }
+    auto visitLtlNext(Parser::LtlNextContext *ctx) -> std::any override {
+        auto inner = visit(ctx->formula());
+        auto p_interval = ctx->interval();
+
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedNext<Tree>{std::any_cast<Interval>(interval),
+                                                            std::any_cast<TreePtr>(inner)});
+        }
+
+        return std::make_shared<Tree>(Next<Tree>{std::any_cast<TreePtr>(inner)});
+    }
 
     auto visitLtlAlways(Parser::LtlAlwaysContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
@@ -283,8 +296,8 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
             auto interval = visit(p_interval);
 
             return std::make_shared<Tree>(BoundedRelease<Tree>{std::any_cast<Interval>(interval),
-                                                             std::any_cast<TreePtr>(left),
-                                                             std::any_cast<TreePtr>(right)});
+                                                               std::any_cast<TreePtr>(left),
+                                                               std::any_cast<TreePtr>(right)});
         }
 
         return std::make_shared<Tree>(

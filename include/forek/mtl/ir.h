@@ -7,7 +7,7 @@ namespace forek::ir {
 template <typename Subtree>
 class BoundedUnary : public Unary<Subtree> {
     using Interval = interval::Interval;
-   
+
    public:
     Interval m_interval;
 
@@ -16,7 +16,16 @@ class BoundedUnary : public Unary<Subtree> {
 
     BoundedUnary(Interval i, std::shared_ptr<Subtree> inner)
         : m_interval{std::move(i)}, Unary<Subtree>(std::move(inner)) {}
+};
 
+template <typename Subtree>
+struct BoundedNext : public BoundedUnary<Subtree> {
+    using BoundedUnary<Subtree>::BoundedUnary;
+
+    template <typename V>
+    auto accept(V &visitor) {
+        return this->m_inner.visit_bounded_next(this->m_interval, this->m_inner->accept(visitor));
+    }
 };
 
 template <typename Subtree>
@@ -51,8 +60,7 @@ class BoundedBinary : public Binary<Subtree> {
     BoundedBinary(Interval i, Subtree left, Subtree right)
         : m_interval{std::move(i)}, Binary<Subtree>(std::move(left), std::move(right)) {}
 
-    BoundedBinary(Interval i, std::shared_ptr<Subtree> left,
-                  std::shared_ptr<Subtree> right)
+    BoundedBinary(Interval i, std::shared_ptr<Subtree> left, std::shared_ptr<Subtree> right)
         : m_interval{std::move(i)}, Binary<Subtree>(std::move(left), std::move(right)) {}
 };
 

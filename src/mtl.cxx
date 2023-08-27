@@ -2,8 +2,8 @@
 #include <string>
 
 #include "forek/interval.h"
-#include "forek/mtl/ir.h"
 #include "forek/mtl/formula.h"
+#include "forek/mtl/ir.h"
 #include "forek/mtl/tree.h"
 
 #include "MetricTemporalLogicLexer.h"
@@ -21,6 +21,7 @@ using forek::interval::Inclusive;
 using forek::interval::Interval;
 using forek::ir::BoundedFinally;
 using forek::ir::BoundedGlobally;
+using forek::ir::BoundedNext;
 using forek::ir::BoundedRelease;
 using forek::ir::BoundedUntil;
 using forek::ir::Conjunction;
@@ -143,9 +144,16 @@ class Builder : public MetricTemporalLogicParserVisitor {
 
     auto visitLtlNext(MtlParser::LtlNextContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto tree = std::any_cast<TreePtr>(inner);
+        auto p_interval = ctx->interval();
 
-        return std::make_shared<Tree>(Next<Tree>{std::move(tree)});
+        if (p_interval) {
+            auto interval = visit(p_interval);
+
+            return std::make_shared<Tree>(BoundedNext<Tree>{std::any_cast<Interval>(interval),
+                                                            std::any_cast<TreePtr>(inner)});
+        }
+
+        return std::make_shared<Tree>(Next<Tree>{std::any_cast<TreePtr>(inner)});
     }
 
     auto visitLtlRelease(MtlParser::LtlReleaseContext *ctx) -> std::any override {
