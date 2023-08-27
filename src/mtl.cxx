@@ -1,7 +1,6 @@
 #include <any>
 #include <string>
 
-#include "common.h"
 #include "forek/interval.h"
 #include "forek/mtl/formula.h"
 #include "forek/mtl/ir.h"
@@ -10,15 +9,16 @@
 #include "MetricTemporalLogicLexer.h"
 #include "MetricTemporalLogicParser.h"
 #include "MetricTemporalLogicParserVisitor.h"
+#include "common.h"
 
 #include "antlr4-runtime.h"
 
 using forek::MetricTemporalLogicLexer;
 using forek::MetricTemporalLogicParser;
 using forek::MetricTemporalLogicParserVisitor;
-using forek::common::make_unary;
 using forek::common::make_binary;
 using forek::common::make_interval;
+using forek::common::make_unary;
 using forek::interval::Endpoint;
 using forek::interval::Exclusive;
 using forek::interval::Inclusive;

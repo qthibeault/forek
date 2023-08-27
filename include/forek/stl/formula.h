@@ -9,7 +9,7 @@
 namespace forek::stl {
 class Formula {
     std::shared_ptr<Tree> m_root;
-    
+
    public:
     explicit Formula(std::string formula);
     explicit Formula(Tree tree);

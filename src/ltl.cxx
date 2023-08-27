@@ -2,22 +2,22 @@
 #include <string>
 #include <valarray>
 
-#include "common.h"
-#include "forek/ltl/ir.h"
 #include "forek/ltl/formula.h"
+#include "forek/ltl/ir.h"
 #include "forek/ltl/tree.h"
 
 #include "LinearTemporalLogicLexer.h"
 #include "LinearTemporalLogicParser.h"
 #include "LinearTemporalLogicParserVisitor.h"
+#include "common.h"
 
 #include "antlr4-runtime.h"
 
 using forek::LinearTemporalLogicLexer;
 using forek::LinearTemporalLogicParser;
 using forek::LinearTemporalLogicParserVisitor;
-using forek::common::make_unary;
 using forek::common::make_binary;
+using forek::common::make_unary;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -69,13 +69,11 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
         return make_binary<Conjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
-    auto visitPlDisjunction(Parser::PlDisjunctionContext *ctx)
-        -> std::any override {
+    auto visitPlDisjunction(Parser::PlDisjunctionContext *ctx) -> std::any override {
         return make_binary<Disjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
-    auto visitPlImplication(Parser::PlImplicationContext *ctx)
-        -> std::any override {
+    auto visitPlImplication(Parser::PlImplicationContext *ctx) -> std::any override {
         return make_binary<Implication, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
@@ -87,8 +85,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
         return make_unary<Globally, Tree>(visit(ctx->formula()));
     }
 
-    auto visitLtlEventually(Parser::LtlEventuallyContext *ctx)
-        -> std::any override {
+    auto visitLtlEventually(Parser::LtlEventuallyContext *ctx) -> std::any override {
         return make_unary<Finally, Tree>(visit(ctx->formula()));
     }
 

@@ -1,4 +1,5 @@
 #include "forek/algebra.h"
+
 #include <stdexcept>
 
 using forek::algebra::Expr;
@@ -98,20 +99,12 @@ struct SumVisitor : public Visitor<Sum> {
         throw std::runtime_error{"bad"};
     }
 
-    auto visit_modulo(Sum lhs, Sum rhs) -> Sum override {
-        throw UnsupportedOperationException{};
-    }
-
-    auto visit_variable(std::string name) -> Sum override {
-        return Sum{std::move(name)};
-    }
-
-    auto visit_value(double value) -> Sum override {
-        return Sum{value};
-    }
+    auto visit_modulo(Sum lhs, Sum rhs) -> Sum override { throw UnsupportedOperationException{}; }
+    auto visit_variable(std::string name) -> Sum override { return Sum{std::move(name)}; }
+    auto visit_value(double value) -> Sum override { return Sum{value}; }
 };
 
-auto forek::algebra::canonical_sum(const Expr &expr) -> Sum {
+auto forek::algebra::canonical_sum(const Expr& expr) -> Sum {
     SumVisitor visitor;
     return expr.evaluate(visitor);
 }
