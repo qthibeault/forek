@@ -10,17 +10,21 @@
 #include "forek/algebra.h"
 #include "forek/mtl/ir.h"
 
-
 namespace forek::ir {
 struct Predicate {
     using Expr = algebra::Expr;
     using Comparison = algebra::Comparison;
 
-    Expr m_left;
+    std::shared_ptr<Expr> m_left;
     Comparison m_cmp;
-    Expr m_right;
+    std::shared_ptr<Expr> m_right;
 
     Predicate(Expr left, Comparison cmp, Expr right)
+        : m_left{std::make_shared<Expr>(left)},
+          m_cmp{cmp},
+          m_right{std::make_shared<Expr>(right)} {}
+
+    Predicate(std::shared_ptr<Expr> left, Comparison cmp, std::shared_ptr<Expr> right)
         : m_left{std::move(left)}, m_cmp{cmp}, m_right{std::move(right)} {}
 
     template <typename V>
