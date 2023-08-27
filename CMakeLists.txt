@@ -19,6 +19,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Generate compile_commands.json for editor tooling support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(ANTLR4_JAR_NAME antlr-4.13.0-complete.jar)
+set(WITH_DEMO OFF)
+set(ANTLR_BUILD_CPP_TESTS OFF)
 
 # Enable FetchContent module to download dependencies
 include(FetchContent)
