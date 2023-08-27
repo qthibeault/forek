@@ -18,6 +18,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Generate compile_commands.json for editor tooling support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(ANTLR4_JAR_NAME antlr-4.13.0-complete.jar)
+
+# Enable FetchContent module to download dependencies
+include(FetchContent)
 
 # Download fmt library
 FetchContent_Declare(fmtlib
@@ -32,17 +36,15 @@ FetchContent_Declare(antlr4
     SOURCE_SUBDIR runtime/Cpp
     EXCLUDE_FROM_ALL true)
 
-FetchContent_MakeAvailable(fmtlib antlr4)
+FetchContent_Declare(antlr4-jar
+    URL https://www.antlr.org/download/${ANTLR4_JAR_NAME}
+    DOWNLOAD_NO_EXTRACT TRUE)
+
+FetchContent_MakeAvailable(fmtlib antlr4 antlr4-jar)
 
 # Include ANTLR4 CMake modules
 list(APPEND CMAKE_MODULE_PATH ${antlr4_SOURCE_DIR}/runtime/Cpp/cmake)
-
-# Load FetchAntlrJar module
-list(APPEND CMAKE_MODULE_PATH )
-include(FetchAntlrJar)
-
-# Locate ANTLR jar file
-FetchAntlrJar(VERSION 4.13.0)
+set(ANTLR_EXECUTABLE ${antlr4-jar_SOURCE_DIR}/${ANTLR4_JAR_NAME})
 
 add_subdirectory(grammars)
 
