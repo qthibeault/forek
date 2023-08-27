@@ -15,6 +15,8 @@ class Literal {
     double m_value;
 
    public:
+    explicit Literal(double value) : m_value{value} {}
+
     template <typename V>
     auto accept(V& visitor) const {
         return visitor.visit_value(m_value);
@@ -25,6 +27,8 @@ class Variable {
     std::string m_name;
 
    public:
+    explicit Variable(std::string name) : m_name{std::move(name)} {}
+
     template <typename V>
     auto accept(V& visitor) const {
         return visitor.visit_value(m_name);
@@ -38,6 +42,9 @@ class Operator {
     std::shared_ptr<Subtree> m_rhs;
 
    public:
+    Operator(std::shared_ptr<Subtree> lhs, std::shared_ptr<Subtree> rhs) : m_lhs{std::move(lhs)}, m_rhs{std::move(rhs)} {}
+    Operator(Subtree lhs, Subtree rhs) : m_lhs{std::make_shared<Subtree>(std::move(lhs))}, m_rhs{std::make_shared<Subtree>(std::move(rhs))} {}
+
     [[nodiscard]] auto lhs() const noexcept -> const Subtree& { return *m_lhs; }
     [[nodiscard]] auto rhs() const noexcept -> const Subtree& { return *m_rhs; }
 };
@@ -45,6 +52,8 @@ class Operator {
 template <typename Subtree>
 class Add : public Operator<Subtree> {
    public:
+    using Operator<Subtree>::Operator;
+
     template <typename V>
     auto accept(V& visitor) const {
         return visitor.visit_addition(this->m_lhs->evaluate(visitor),
@@ -54,6 +63,8 @@ class Add : public Operator<Subtree> {
 
 template <typename Subtree>
 class Sub : public Operator<Subtree> {
+    using Operator<Subtree>::Operator;
+
    public:
     template <typename V>
     auto accept(V& visitor) const {
@@ -64,6 +75,8 @@ class Sub : public Operator<Subtree> {
 
 template <typename Subtree>
 class Mult : public Operator<Subtree> {
+    using Operator<Subtree>::Operator;
+
    public:
     template <typename V>
     auto accept(V& visitor) const {
@@ -74,6 +87,8 @@ class Mult : public Operator<Subtree> {
 
 template <typename Subtree>
 class Div : public Operator<Subtree> {
+    using Operator<Subtree>::Operator;
+
    public:
     template <typename V>
     auto accept(V& visitor) const {
@@ -84,6 +99,8 @@ class Div : public Operator<Subtree> {
 
 template <typename Subtree>
 class Mod : public Operator<Subtree> {
+    using Operator<Subtree>::Operator;
+
    public:
     template <typename V>
     auto accept(V& visitor) const {
@@ -103,7 +120,7 @@ class Visitor {
     virtual auto visit_modulo(T lhs, T rhs) -> T = 0;
 };
 
-enum class Comparison { GreaterThan, GreaterThanEqual, LessThanEqual, LessThan };
+enum class Comparison { GreaterThan, GreaterThanEqual, Equal, LessThanEqual, LessThan, NotEqual };
 
 class Expr {
     using Node =
