@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 #include "forek/ltl/tree.h"
 #include "forek/ltl/visitor.h"
@@ -11,11 +11,7 @@ class Formula {
     std::shared_ptr<Tree> m_root;
 
    public:
-    Formula() = delete;
-    Formula(const Formula &other) = default;
-    Formula(Formula &&other) = default;
-
-    explicit Formula(std::string formula);
+    explicit Formula(std::string_view formula);
     explicit Formula(Tree root);
 
     template <typename T>

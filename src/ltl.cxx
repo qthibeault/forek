@@ -1,6 +1,4 @@
 #include <any>
-#include <string>
-#include <valarray>
 
 #include "forek/ltl/formula.h"
 #include "forek/ltl/ir.h"
@@ -19,8 +17,6 @@ using forek::LinearTemporalLogicParser;
 using forek::LinearTemporalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
-using forek::listeners::LexerErrorListener;
-using forek::listeners::ParserErrorListener;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -34,6 +30,8 @@ using forek::ir::Proposition;
 using forek::ir::Release;
 using forek::ir::True;
 using forek::ir::Until;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 using forek::ltl::Formula;
 using forek::ltl::Tree;
 
@@ -105,7 +103,7 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
     }
 };
 
-auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
+auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = LinearTemporalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -126,5 +124,5 @@ auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
     return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(std::string formula) : m_root{parse_formula(std::move(formula))} {}
+Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
