@@ -1,4 +1,5 @@
 #include <any>
+#include <stdexcept>
 
 #include "forek/ltl/formula.h"
 #include "forek/ltl/ir.h"
@@ -35,7 +36,7 @@ using forek::listeners::ParserErrorListener;
 using forek::ltl::Formula;
 using forek::ltl::Tree;
 
-class FormulaBuilder : public LinearTemporalLogicParserVisitor {
+class LTLBuilder : public LinearTemporalLogicParserVisitor {
     using Parser = LinearTemporalLogicParser;
 
     auto visitStart(Parser::StartContext *ctx) -> std::any override {
@@ -118,7 +119,7 @@ auto parse_ltl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = FormulaBuilder{};
+    auto builder = LTLBuilder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);

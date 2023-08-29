@@ -59,7 +59,7 @@ auto parse_interval_value(SignalTemporalLogicParser::IntervalContext *ctx) -> do
                             : std::stod(ctx->Scalar(N)->getText());
 }
 
-class Builder : public SignalTemporalLogicParserBaseVisitor {
+class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     using Parser = SignalTemporalLogicParser;
 
    public:
@@ -310,7 +310,7 @@ auto parse_stl_formula(std::string formula) -> TreePtr {
     auto lexer = SignalTemporalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = SignalTemporalLogicParser(&token_stream);
-    auto builder = Builder{};
+    auto builder = STLBuilder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<TreePtr>(output);

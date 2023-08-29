@@ -31,7 +31,7 @@ using forek::ir::True;
 using forek::pl::Formula;
 using forek::pl::Tree;
 
-class FormulaBuilder : public PropositionalLogicParserVisitor {
+class PLBuilder : public PropositionalLogicParserVisitor {
     using Parser = PropositionalLogicParser;
 
    public:
@@ -95,7 +95,7 @@ auto parse_pl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = FormulaBuilder{};
+    auto builder = PLBuilder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);

@@ -44,7 +44,7 @@ using forek::ir::Until;
 using forek::mtl::Formula;
 using forek::mtl::Tree;
 
-class Builder : public MetricTemporalLogicParserVisitor {
+class MTLBuilder : public MetricTemporalLogicParserVisitor {
     using Parser = MetricTemporalLogicParser;
 
     auto visitStart(Parser::StartContext *ctx) -> std::any override {
@@ -158,7 +158,7 @@ auto parse_mtl_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto lexer = MetricTemporalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = MetricTemporalLogicParser(&token_stream);
-    auto builder = Builder{};
+    auto builder = MTLBuilder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);
