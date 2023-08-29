@@ -305,7 +305,7 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
     }
 };
 
-auto parse_formula(std::string formula) -> TreePtr {
+auto parse_stl_formula(std::string formula) -> TreePtr {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = SignalTemporalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
@@ -316,6 +316,6 @@ auto parse_formula(std::string formula) -> TreePtr {
     return std::any_cast<TreePtr>(output);
 }
 
-Formula::Formula(std::string formula) : m_root{parse_formula(std::move(formula))} {}
+Formula::Formula(std::string formula) : m_root{parse_stl_formula(std::move(formula))} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 Formula::Formula(std::shared_ptr<Tree> root) : m_root{std::move(root)} {}

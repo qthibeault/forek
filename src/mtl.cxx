@@ -153,7 +153,7 @@ class Builder : public MetricTemporalLogicParserVisitor {
     }
 };
 
-auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
+auto parse_mtl_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = MetricTemporalLogicLexer(&input_stream);
     auto token_stream = antlr4::CommonTokenStream(&lexer);
@@ -164,5 +164,5 @@ auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
     return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(std::string formula) : m_root{parse_formula(std::move(formula))} {}
+Formula::Formula(std::string formula) : m_root{parse_mtl_formula(std::move(formula))} {}
 Formula::Formula(Tree root) { this->m_root = std::make_shared<Tree>(std::move(root)); }
