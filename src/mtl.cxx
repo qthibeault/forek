@@ -10,6 +10,7 @@
 #include "MetricTemporalLogicParser.h"
 #include "MetricTemporalLogicParserVisitor.h"
 #include "common.h"
+#include "listeners.h"
 
 #include "antlr4-runtime.h"
 
@@ -19,6 +20,8 @@ using forek::MetricTemporalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_interval;
 using forek::common::make_unary;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 using forek::interval::Endpoint;
 using forek::interval::Exclusive;
 using forek::interval::Inclusive;
@@ -156,8 +159,18 @@ class MTLBuilder : public MetricTemporalLogicParserVisitor {
 auto parse_mtl_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = MetricTemporalLogicLexer(&input_stream);
+    auto lexer_listener = std::make_unique<LexerErrorListener>();
+
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(lexer_listener.get());
+
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = MetricTemporalLogicParser(&token_stream);
+    auto parser_listener = std::make_unique<ParserErrorListener>();
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(parser_listener.get());
+
     auto builder = MTLBuilder{};
     auto output = builder.visit(parser.start());
 

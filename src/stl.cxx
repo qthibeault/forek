@@ -11,6 +11,7 @@
 #include "SignalTemporalLogicParser.h"
 #include "SignalTemporalLogicParserBaseVisitor.h"
 #include "common.h"
+#include "listeners.h"
 
 #include "antlr4-runtime.h"
 
@@ -49,6 +50,8 @@ using forek::ir::Proposition;
 using forek::ir::Release;
 using forek::ir::True;
 using forek::ir::Until;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 using forek::stl::Formula;
 using forek::stl::Tree;
 
@@ -244,8 +247,18 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
 auto parse_stl_formula(std::string formula) -> TreePtr {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = SignalTemporalLogicLexer(&input_stream);
+    auto lexer_listener = std::make_unique<LexerErrorListener>();
+
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(lexer_listener.get());
+
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = SignalTemporalLogicParser(&token_stream);
+    auto parser_listener = std::make_unique<ParserErrorListener>();
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(parser_listener.get());
+
     auto builder = STLBuilder{};
     auto output = builder.visit(parser.start());
 
