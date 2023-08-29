@@ -72,7 +72,7 @@ TEST_CASE("Propositional Logic", "[pl]") {
 
     SECTION("Requirement 4") {
         static std::string req =
-            "not (p) && (not q) & not (p) && (not q) & not (p) && (not q) or not (p) && (not q)";
+            "not (p) && (not q) && not (p) && (not q) && not (p) && (not q) or not (p) && (not q)";
 
         REQUIRE(try_parse(req));
     }
@@ -87,7 +87,7 @@ TEST_CASE("Propositional Logic", "[pl]") {
 
     SECTION("Requirement 6") {
         static std::string req =
-            "not (p) && (not q) & not (p) && (not q) & not (p) && (not q) or not (p) && (not q) and "
+            "not (p) && (not q) && not (p) && (not q) && not (p) && (not q) or not (p) && (not q) and "
             "not (p) && (not q) implies not (p) && (not q)";
 
         REQUIRE(try_parse(req));

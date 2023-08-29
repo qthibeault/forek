@@ -75,5 +75,4 @@ target_link_libraries(forek PRIVATE
     stpl_parser
     fmt::fmt-header-only)
 
-enable_testing()
 add_subdirectory(tests)
