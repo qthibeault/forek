@@ -18,6 +18,8 @@ using forek::PropositionalLogicParser;
 using forek::PropositionalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -81,14 +83,14 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
 auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
-    auto lexer_listener = std::make_unique<forek::errors::LexerErrorListener>();
+    auto lexer_listener = std::make_unique<LexerErrorListener>();
 
     lexer.removeErrorListeners();
     lexer.addErrorListener(lexer_listener.get());
 
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = PropositionalLogicParser(&token_stream);
-    auto parser_listener = std::make_unique<forek::errors::ParserErrorListener>();
+    auto parser_listener = std::make_unique<ParserErrorListener>();
 
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());

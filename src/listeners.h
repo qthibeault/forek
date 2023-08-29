@@ -9,7 +9,7 @@
 #include "Recognizer.h"
 #include "Token.h"
 
-namespace forek::errors {
+namespace forek::listeners {
 
 class LexerErrorListener : public antlr4::BaseErrorListener {
    public:
@@ -27,4 +27,4 @@ class ParserErrorListener : public antlr4::BaseErrorListener {
     }
 };
 
-}  // namespace forek::errors
+}  // namespace forek::listeners
