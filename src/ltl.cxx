@@ -10,6 +10,7 @@
 #include "LinearTemporalLogicParser.h"
 #include "LinearTemporalLogicParserVisitor.h"
 #include "common.h"
+#include "listeners.h"
 
 #include "antlr4-runtime.h"
 
@@ -18,6 +19,8 @@ using forek::LinearTemporalLogicParser;
 using forek::LinearTemporalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -105,8 +108,18 @@ class FormulaBuilder : public LinearTemporalLogicParserVisitor {
 auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = LinearTemporalLogicLexer(&input_stream);
+    auto lexer_listener = std::make_unique<LexerErrorListener>();
+
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(lexer_listener.get());
+
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = LinearTemporalLogicParser(&token_stream);
+    auto parser_listener = std::make_unique<ParserErrorListener>();
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(parser_listener.get());
+
     auto builder = FormulaBuilder{};
     auto output = builder.visit(parser.start());
 
