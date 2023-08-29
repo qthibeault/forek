@@ -7,6 +7,8 @@ project(forek
   LANGUAGES CXX
 )
 
+option(FOREK_ENABLE_TESTS "Enable testing FoRek library" ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
 
@@ -75,4 +77,7 @@ target_link_libraries(forek PRIVATE
     stpl_parser
     fmt::fmt-header-only)
 
-add_subdirectory(tests)
+if(FOREK_ENABLE_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
