@@ -8,7 +8,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
-enable_testing()
 add_executable(test_pl test_pl.cxx)
 target_link_libraries(test_pl PRIVATE forek Catch2::Catch2WithMain)
 
