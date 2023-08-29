@@ -10,6 +10,7 @@
 #include "SignalTemporalLogicLexer.h"
 #include "SignalTemporalLogicParser.h"
 #include "SignalTemporalLogicParserBaseVisitor.h"
+#include "common.h"
 
 #include "antlr4-runtime.h"
 
@@ -25,9 +26,10 @@ using forek::algebra::Mod;
 using forek::algebra::Mult;
 using forek::algebra::Sub;
 using forek::algebra::Variable;
+using forek::common::make_binary;
+using forek::common::make_interval;
+using forek::common::make_unary;
 using forek::interval::Interval;
-using forek::interval::make_exclusive;
-using forek::interval::make_inclusive;
 using forek::ir::BoundedFinally;
 using forek::ir::BoundedGlobally;
 using forek::ir::BoundedNext;
@@ -53,12 +55,6 @@ using forek::stl::Tree;
 using TreePtr = std::shared_ptr<Tree>;
 using ExprPtr = std::shared_ptr<Expr>;
 
-template <size_t N>
-auto parse_interval_value(SignalTemporalLogicParser::IntervalContext *ctx) -> double {
-    return ctx->Infinity(N) ? std::numeric_limits<double>::infinity()
-                            : std::stod(ctx->Scalar(N)->getText());
-}
-
 class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     using Parser = SignalTemporalLogicParser;
 
@@ -72,12 +68,7 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     }
 
     auto visitInterval(Parser::IntervalContext *ctx) -> std::any override {
-        auto lval = parse_interval_value<0>(ctx);
-        auto uval = parse_interval_value<1>(ctx);
-        auto lower = ctx->LeftBracket() ? make_inclusive(lval) : make_exclusive(lval);
-        auto upper = ctx->RightBracket() ? make_inclusive(uval) : make_exclusive(uval);
-
-        return Interval{lower, upper};
+        return make_interval(ctx);
     }
 
     auto visitArithmeticParentheses(Parser::ArithmeticParenthesesContext *ctx)
@@ -90,43 +81,23 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     }
 
     auto visitArithmeticPlus(Parser::ArithmeticPlusContext *ctx) -> std::any override {
-        auto left = visit(ctx->expression(0));
-        auto right = visit(ctx->expression(1));
-
-        return std::make_shared<Expr>(
-            Add<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+        return make_binary<Add, Expr>(visit(ctx->expression(0)), visit(ctx->expression(1)));
     }
 
     auto visitArithmeticMinus(Parser::ArithmeticMinusContext *ctx) -> std::any override {
-        auto left = visit(ctx->expression(0));
-        auto right = visit(ctx->expression(1));
-
-        return std::make_shared<Expr>(
-            Sub<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+        return make_binary<Sub, Expr>(visit(ctx->expression(0)), visit(ctx->expression(1)));
     }
 
     auto visitArithmeticTimes(Parser::ArithmeticTimesContext *ctx) -> std::any override {
-        auto left = visit(ctx->expression(0));
-        auto right = visit(ctx->expression(1));
-
-        return std::make_shared<Expr>(
-            Mult<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+        return make_binary<Mult, Expr>(visit(ctx->expression(0)), visit(ctx->expression(1)));
     }
 
     auto visitArithmeticDivide(Parser::ArithmeticDivideContext *ctx) -> std::any override {
-        auto left = visit(ctx->expression(0));
-        auto right = visit(ctx->expression(1));
-
-        return std::make_shared<Expr>(
-            Div<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+        return make_binary<Div, Expr>(visit(ctx->expression(0)), visit(ctx->expression(1)));
     }
 
     auto visitArithmeticModulus(Parser::ArithmeticModulusContext *ctx) -> std::any override {
-        auto left = visit(ctx->expression(0));
-        auto right = visit(ctx->expression(1));
-
-        return std::make_shared<Expr>(
-            Mod<Expr>{std::any_cast<ExprPtr>(left), std::any_cast<ExprPtr>(right)});
+        return make_binary<Mod, Expr>(visit(ctx->expression(0)), visit(ctx->expression(1)));
     }
 
     auto visitArithmeticVariable(Parser::ArithmeticVariableContext *ctx) -> std::any override {
@@ -193,115 +164,80 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     }
 
     auto visitPlNegation(SignalTemporalLogicParser::PlNegationContext *ctx) -> std::any override {
-        return nullptr;
+        return make_unary<Negation, Tree>(visit(ctx->formula()));
     }
 
     auto visitPlConjunction(Parser::PlConjunctionContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-
-        return std::make_shared<Tree>(
-            Conjunction<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Conjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
     auto visitPlDisjunction(Parser::PlDisjunctionContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-
-        return std::make_shared<Tree>(
-            Disjunction<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Disjunction, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
     auto visitPlImplication(Parser::PlImplicationContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-
-        return std::make_shared<Tree>(
-            Implication<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Implication, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
     auto visitPlIff(Parser::PlIffContext *ctx) -> std::any override {
-        auto left = visit(ctx->formula(0));
-        auto right = visit(ctx->formula(1));
-
-        return std::make_shared<Tree>(
-            Equivalence<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Equivalence, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
     }
 
     auto visitLtlNext(Parser::LtlNextContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto p_interval = ctx->interval();
+        auto interval = ctx->interval();
 
-        if (p_interval) {
-            auto interval = visit(p_interval);
-
-            return std::make_shared<Tree>(BoundedNext<Tree>{std::any_cast<Interval>(interval),
-                                                            std::any_cast<TreePtr>(inner)});
+        if (interval) {
+            return make_unary<BoundedNext, Tree>(visit(interval), inner);
         }
 
-        return std::make_shared<Tree>(Next<Tree>{std::any_cast<TreePtr>(inner)});
+        return make_unary<Next, Tree>(inner);
     }
 
     auto visitLtlAlways(Parser::LtlAlwaysContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto p_interval = ctx->interval();
+        auto interval = ctx->interval();
 
-        if (p_interval) {
-            auto interval = visit(p_interval);
-
-            return std::make_shared<Tree>(BoundedGlobally<Tree>{std::any_cast<Interval>(interval),
-                                                                std::any_cast<TreePtr>(inner)});
+        if (interval) {
+            return make_unary<BoundedGlobally, Tree>(visit(interval), inner);
         }
 
-        return std::make_shared<Tree>(Globally<Tree>{std::any_cast<TreePtr>(inner)});
+        return make_unary<Globally, Tree>(inner);
     }
 
     auto visitLtlEventually(Parser::LtlEventuallyContext *ctx) -> std::any override {
         auto inner = visit(ctx->formula());
-        auto p_interval = ctx->interval();
+        auto interval = ctx->interval();
 
-        if (p_interval) {
-            auto interval = visit(p_interval);
-
-            return std::make_shared<Tree>(BoundedFinally<Tree>{std::any_cast<Interval>(interval),
-                                                               std::any_cast<TreePtr>(inner)});
+        if (interval) {
+            return make_unary<BoundedFinally, Tree>(visit(interval), inner);
         }
 
-        return std::make_shared<Tree>(Finally<Tree>{std::any_cast<TreePtr>(inner)});
+        return make_unary<Finally, Tree>(inner);
     }
 
     auto visitLtlUntil(Parser::LtlUntilContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-        auto p_interval = ctx->interval();
+        auto interval = ctx->interval();
 
-        if (p_interval) {
-            auto interval = visit(p_interval);
-
-            return std::make_shared<Tree>(BoundedUntil<Tree>{std::any_cast<Interval>(interval),
-                                                             std::any_cast<TreePtr>(left),
-                                                             std::any_cast<TreePtr>(right)});
+        if (interval) {
+            return make_binary<BoundedUntil, Tree>(visit(interval), left, right);
         }
 
-        return std::make_shared<Tree>(
-            Until<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Until, Tree>(left, right);
     }
 
     auto visitLtlRelease(Parser::LtlReleaseContext *ctx) -> std::any override {
         auto left = visit(ctx->formula(0));
         auto right = visit(ctx->formula(1));
-        auto p_interval = ctx->interval();
+        auto interval = ctx->interval();
 
-        if (p_interval) {
-            auto interval = visit(p_interval);
-
-            return std::make_shared<Tree>(BoundedRelease<Tree>{std::any_cast<Interval>(interval),
-                                                               std::any_cast<TreePtr>(left),
-                                                               std::any_cast<TreePtr>(right)});
+        if (interval) {
+            return make_binary<BoundedRelease, Tree>(visit(interval), left, right);
         }
 
-        return std::make_shared<Tree>(
-            Release<Tree>{std::any_cast<TreePtr>(left), std::any_cast<TreePtr>(right)});
+        return make_binary<Release, Tree>(left, right);
     }
 };
 
