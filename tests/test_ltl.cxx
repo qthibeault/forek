@@ -1,16 +1,9 @@
-#include <exception>
-#include <string>
-
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "forek/errors.h"
 #include "forek/ltl.h"
 #include "forek/mtl.h"
 #include "forek/stl.h"
-
-using forek::errors::LexerError;
-using forek::errors::ParserError;
 
 TEMPLATE_TEST_CASE("Next", "[ltl]", forek::ltl::Formula, forek::mtl::Formula, forek::stl::Formula) {
     REQUIRE_NOTHROW(TestType("X p"));
