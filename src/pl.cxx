@@ -1,5 +1,6 @@
 #include <string>
 
+#include "forek/errors.h"
 #include "forek/pl/formula.h"
 #include "forek/pl/ir.h"
 #include "forek/pl/tree.h"
@@ -10,6 +11,7 @@
 #include "PropositionalLogicParser.h"
 #include "PropositionalLogicParserVisitor.h"
 #include "common.h"
+#include "listeners.h"
 
 using forek::PropositionalLogicLexer;
 using forek::PropositionalLogicParser;
@@ -79,8 +81,18 @@ class FormulaBuilder : public PropositionalLogicParserVisitor {
 auto parse_formula(std::string formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
+    auto lexer_listener = std::make_unique<forek::errors::LexerErrorListener>();
+
+    lexer.removeErrorListeners();
+    lexer.addErrorListener(lexer_listener.get());
+
     auto token_stream = antlr4::CommonTokenStream(&lexer);
     auto parser = PropositionalLogicParser(&token_stream);
+    auto parser_listener = std::make_unique<forek::errors::ParserErrorListener>();
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(parser_listener.get());
+
     auto builder = FormulaBuilder{};
     auto output = builder.visit(parser.start());
 
