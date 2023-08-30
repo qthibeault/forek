@@ -61,6 +61,8 @@ class Interval {
    public:
     Interval(Endpoint start, Endpoint end);
 
+    explicit operator std::string() const;
+
     [[nodiscard]] auto lower() const noexcept -> Endpoint { return m_lower; }
     [[nodiscard]] auto upper() const noexcept -> Endpoint { return m_upper; }
 };

@@ -47,6 +47,8 @@ struct fmt::formatter<Interval> {
     }
 };
 
+Interval::operator std::string() const { return fmt::format("{}", *this); }
+
 ZeroLengthInterval::ZeroLengthInterval(const Interval &i)
     : m_msg{fmt::format("Interval {} has a length of zero", i)} {}
 
