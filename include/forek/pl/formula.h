@@ -19,6 +19,8 @@ class Formula {
 
     explicit operator std::string() const;
 
+    auto operator==(const Formula&) const -> bool;
+
     template <typename T>
     auto evaluate(Visitor<T>& v) const -> T {
         return m_root->accept(v);

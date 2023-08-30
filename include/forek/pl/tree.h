@@ -19,6 +19,8 @@ class Tree {
    public:
     explicit Tree(Node node) : m_node{std::move(node)} {}
 
+    auto operator==(const Tree &tree) const -> bool;
+
     template <typename T>
     auto accept(forek::pl::Visitor<T> &visitor) -> T {
         return std::visit([&visitor](const auto &node) { return node.accept(visitor); }, m_node);

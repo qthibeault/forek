@@ -137,4 +137,7 @@ Formula::operator std::string() const {
     return this->evaluate(builder);
 }
 
+auto Formula::operator==(const Formula &tree) const -> bool { return *m_root == *tree.m_root; }
+auto Tree::operator==(const Tree &tree) const -> bool { return m_node == tree.m_node; }
+
 }  // namespace forek::pl
