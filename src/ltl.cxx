@@ -36,7 +36,9 @@ using forek::listeners::ParserErrorListener;
 using forek::ltl::Formula;
 using forek::ltl::Tree;
 
-class LTLBuilder : public LinearTemporalLogicParserVisitor {
+namespace forek::ltl {
+
+class Builder : public LinearTemporalLogicParserVisitor {
     using Parser = LinearTemporalLogicParser;
 
     auto visitStart(Parser::StartContext *ctx) -> std::any override {
@@ -119,7 +121,7 @@ auto parse_ltl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = LTLBuilder{};
+    auto builder = Builder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);
@@ -127,3 +129,6 @@ auto parse_ltl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 
 Formula::Formula(std::string_view formula) : m_root{parse_ltl_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+}  // namespace forek::ltl
+
