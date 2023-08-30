@@ -55,3 +55,11 @@ TEMPLATE_TEST_CASE("PL Composition", "[pl]", forek::pl::Formula, forek::ltl::For
                    forek::mtl::Formula, forek::stl::Formula) {
     REQUIRE_NOTHROW(TestType("not a and (b -> c) or (!d <-> e)"));
 }
+
+TEMPLATE_TEST_CASE("PL String Conversion", "[pl]", forek::pl::Formula) {
+    auto f1 = TestType("not a and (b -> c) or (!d <-> e)");
+    auto str = std::string{f1};
+    auto f2 = TestType(str);
+
+    REQUIRE(f1 == f2);
+}
