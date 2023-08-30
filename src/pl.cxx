@@ -11,6 +11,7 @@
 #include "PropositionalLogicParser.h"
 #include "PropositionalLogicParserVisitor.h"
 #include "common.h"
+#include "fmt/format.h"
 #include "listeners.h"
 
 using forek::PropositionalLogicLexer;
@@ -18,8 +19,6 @@ using forek::PropositionalLogicParser;
 using forek::PropositionalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
-using forek::listeners::LexerErrorListener;
-using forek::listeners::ParserErrorListener;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -28,6 +27,8 @@ using forek::ir::Implication;
 using forek::ir::Negation;
 using forek::ir::Proposition;
 using forek::ir::True;
+using forek::listeners::LexerErrorListener;
+using forek::listeners::ParserErrorListener;
 
 namespace forek::pl {
 
@@ -80,6 +81,33 @@ class Builder : public PropositionalLogicParserVisitor {
     }
 };
 
+class StringBuilder : public Visitor<std::string> {
+   public:
+    auto visit_true() -> std::string override { return "true"; }
+    auto visit_false() -> std::string override { return "false"; }
+    auto visit_proposition(std::string name) -> std::string override { return name; }
+
+    auto visit_negation(std::string inner) -> std::string override {
+        return fmt::format("not {}", inner);
+    }
+
+    auto visit_conjunction(std::string left, std::string right) -> std::string override {
+        return fmt::format("({}) and ({})", left, right);
+    }
+
+    auto visit_disjunction(std::string left, std::string right) -> std::string override {
+        return fmt::format("({}) or ({})", left, right);
+    }
+
+    auto visit_implication(std::string ante, std::string cons) -> std::string override {
+        return fmt::format("({}) implies ({})", ante, cons);
+    }
+
+    auto visit_equivalence(std::string ante, std::string cons) -> std::string override {
+        return fmt::format("({}) iff ({})", ante, cons);
+    }
+};
+
 auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
@@ -103,5 +131,10 @@ auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 
 Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+Formula::operator std::string() const {
+    StringBuilder builder;
+    return this->evaluate(builder);
+}
 
 }  // namespace forek::pl
