@@ -43,7 +43,7 @@ struct Negation : public Unary<Subtree> {
 
     template <typename V>
     inline auto accept(V &visitor) const {
-        return visitor.visit_negation(this->m_tree->accept(visitor));
+        return visitor.visit_negation(this->m_inner->accept(visitor));
     }
 };
 
