@@ -42,8 +42,11 @@ class Operator {
     std::shared_ptr<Subtree> m_rhs;
 
    public:
-    Operator(std::shared_ptr<Subtree> lhs, std::shared_ptr<Subtree> rhs) : m_lhs{std::move(lhs)}, m_rhs{std::move(rhs)} {}
-    Operator(Subtree lhs, Subtree rhs) : m_lhs{std::make_shared<Subtree>(std::move(lhs))}, m_rhs{std::make_shared<Subtree>(std::move(rhs))} {}
+    Operator(std::shared_ptr<Subtree> lhs, std::shared_ptr<Subtree> rhs)
+        : m_lhs{std::move(lhs)}, m_rhs{std::move(rhs)} {}
+    Operator(Subtree lhs, Subtree rhs)
+        : m_lhs{std::make_shared<Subtree>(std::move(lhs))},
+          m_rhs{std::make_shared<Subtree>(std::move(rhs))} {}
 
     [[nodiscard]] auto lhs() const noexcept -> const Subtree& { return *m_lhs; }
     [[nodiscard]] auto rhs() const noexcept -> const Subtree& { return *m_rhs; }
@@ -93,7 +96,7 @@ class Div : public Operator<Subtree> {
     template <typename V>
     auto accept(V& visitor) const {
         return visitor.visit_division(this->m_lhs->evaluate(visitor),
-                                            this->m_rhs->evaluate(visitor));
+                                      this->m_rhs->evaluate(visitor));
     }
 };
 
@@ -104,8 +107,7 @@ class Mod : public Operator<Subtree> {
    public:
     template <typename V>
     auto accept(V& visitor) const {
-        return visitor.visit_modulo(this->m_lhs->evaluate(visitor),
-                                            this->m_rhs->evaluate(visitor));
+        return visitor.visit_modulo(this->m_lhs->evaluate(visitor), this->m_rhs->evaluate(visitor));
     }
 };
 
@@ -165,7 +167,7 @@ class Sum {
             : m_scalar{scalar}, m_name{std::nullopt} {}
 
         Term(std::string name)  // NOLINT: google-explicit-constructors
-            : m_name{std::move(name)}, m_scalar{1.0} {}
+            : m_scalar{1.0}, m_name{std::move(name)} {}
 
         Term(double scalar, std::string name) : m_scalar{scalar}, m_name{std::move(name)} {}
         Term(std::string name, double scalar) : m_scalar{scalar}, m_name{std::move(name)} {}

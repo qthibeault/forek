@@ -150,11 +150,11 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
         return std::make_shared<Tree>(Proposition{ctx->Identifier()->getText()});
     }
 
-    auto visitPlTrue(Parser::PlTrueContext *ctx) -> std::any override {
+    auto visitPlTrue(Parser::PlTrueContext *) -> std::any override {
         return std::make_shared<Tree>(True{});
     }
 
-    auto visitPlFalse(Parser::PlFalseContext *ctx) -> std::any override {
+    auto visitPlFalse(Parser::PlFalseContext *) -> std::any override {
         return std::make_shared<Tree>(False{});
     }
 

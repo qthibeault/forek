@@ -12,10 +12,10 @@ class BoundedUnary : public Unary<Subtree> {
     Interval m_interval;
 
     BoundedUnary(Interval i, Subtree inner)
-        : m_interval{std::move(i)}, Unary<Subtree>(std::move(inner)) {}
+        : Unary<Subtree>(std::move(inner)), m_interval{std::move(i)} {}
 
     BoundedUnary(Interval i, std::shared_ptr<Subtree> inner)
-        : m_interval{std::move(i)}, Unary<Subtree>(std::move(inner)) {}
+        : Unary<Subtree>(std::move(inner)), m_interval{std::move(i)} {}
 };
 
 template <typename Subtree>
@@ -58,10 +58,10 @@ class BoundedBinary : public Binary<Subtree> {
     Interval m_interval;
 
     BoundedBinary(Interval i, Subtree left, Subtree right)
-        : m_interval{std::move(i)}, Binary<Subtree>(std::move(left), std::move(right)) {}
+        : Binary<Subtree>(std::move(left), std::move(right)), m_interval{std::move(i)} {}
 
     BoundedBinary(Interval i, std::shared_ptr<Subtree> left, std::shared_ptr<Subtree> right)
-        : m_interval{std::move(i)}, Binary<Subtree>(std::move(left), std::move(right)) {}
+        : Binary<Subtree>(std::move(left), std::move(right)), m_interval{std::move(i)} {}
 };
 
 template <typename Subtree>
