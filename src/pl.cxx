@@ -28,10 +28,10 @@ using forek::ir::Implication;
 using forek::ir::Negation;
 using forek::ir::Proposition;
 using forek::ir::True;
-using forek::pl::Formula;
-using forek::pl::Tree;
 
-class PLBuilder : public PropositionalLogicParserVisitor {
+namespace forek::pl {
+
+class Builder : public PropositionalLogicParserVisitor {
     using Parser = PropositionalLogicParser;
 
    public:
@@ -80,7 +80,7 @@ class PLBuilder : public PropositionalLogicParserVisitor {
     }
 };
 
-auto parse_pl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
+auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = PropositionalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -95,11 +95,13 @@ auto parse_pl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = PLBuilder{};
+    auto builder = Builder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(std::string_view formula) : m_root{parse_pl_formula(formula)} {}
+Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+}  // namespace forek::pl
