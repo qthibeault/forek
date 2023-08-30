@@ -1,54 +1,30 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(forek
-  VERSION 0.0.1
+  VERSION 0.1.0
   DESCRIPTION "A toolkit for authoring and parsing Temporal Logic formulae."
   HOMEPAGE_URL "https://github.com/andersonjwan/forek"
   LANGUAGES CXX
 )
 
-option(FOREK_ENABLE_TESTS "Enable testing FoRek library" ON)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON) # C++20 features are used in this project
-
-# Disable vender-specific plugins by default.
-#
-# This is disabled to protect unwarrented linking of other extensions but can be
-# overridden on a per-target basis.
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Generate compile_commands.json for editor tooling support
+# Create compile_commands.json for editor tooling support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(ANTLR4_JAR_NAME antlr-4.13.0-complete.jar)
-set(WITH_DEMO OFF)
-set(ANTLR_BUILD_CPP_TESTS OFF)
+
+# Option to enable testing for FoRek library
+option(FOREK_ENABLE_TESTS "Enable testing FoRek library" ON)
 
 # Enable FetchContent module to download dependencies
 include(FetchContent)
 
+# Ensure Git is installed before fetching dependencies
+find_package(Git REQUIRED)
+
 # Download fmt library
 FetchContent_Declare(fmtlib
     GIT_REPOSITORY https://github.com/fmtlib/fmt
-    GIT_TAG 10.1.0
-    EXCLUDE_FROM_ALL true)
+    GIT_TAG 10.1.0)
 
-# Download ANTLR4 library
-FetchContent_Declare(antlr4
-    GIT_REPOSITORY https://github.com/antlr/antlr4
-    GIT_TAG 4.13.0
-    SOURCE_SUBDIR runtime/Cpp
-    EXCLUDE_FROM_ALL true)
-
-FetchContent_Declare(antlr4-jar
-    URL https://www.antlr.org/download/${ANTLR4_JAR_NAME}
-    DOWNLOAD_NO_EXTRACT TRUE)
-
-FetchContent_MakeAvailable(fmtlib antlr4 antlr4-jar)
-
-# Include ANTLR4 CMake modules
-list(APPEND CMAKE_MODULE_PATH ${antlr4_SOURCE_DIR}/runtime/Cpp/cmake)
-set(ANTLR_EXECUTABLE ${antlr4-jar_SOURCE_DIR}/${ANTLR4_JAR_NAME})
+FetchContent_MakeAvailable(fmtlib)
 
 add_subdirectory(grammars)
 
@@ -76,6 +52,18 @@ target_link_libraries(forek PRIVATE
     tqtl_parser
     stpl_parser
     fmt::fmt-header-only)
+
+target_compile_features(forek PUBLIC cxx_std_17)
+
+if (MSVC)
+    # warning level 4
+    target_compile_options(forek PRIVATE /Wall /WX)
+else()
+    # additional warnings
+    target_compile_options(forek PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+
+add_library(forek::forek ALIAS forek)
 
 if(FOREK_ENABLE_TESTS)
     enable_testing()
