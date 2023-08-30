@@ -36,20 +36,16 @@ class Variable {
 };
 
 template <typename Subtree>
-class Operator {
-   protected:
+struct Operator {
     std::shared_ptr<Subtree> m_lhs;
     std::shared_ptr<Subtree> m_rhs;
 
-   public:
     Operator(std::shared_ptr<Subtree> lhs, std::shared_ptr<Subtree> rhs)
         : m_lhs{std::move(lhs)}, m_rhs{std::move(rhs)} {}
+
     Operator(Subtree lhs, Subtree rhs)
         : m_lhs{std::make_shared<Subtree>(std::move(lhs))},
           m_rhs{std::make_shared<Subtree>(std::move(rhs))} {}
-
-    [[nodiscard]] auto lhs() const noexcept -> const Subtree& { return *m_lhs; }
-    [[nodiscard]] auto rhs() const noexcept -> const Subtree& { return *m_rhs; }
 };
 
 template <typename Subtree>
