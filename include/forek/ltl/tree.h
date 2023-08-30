@@ -17,11 +17,9 @@ class Tree {
     Node m_node;
 
    public:
-    Tree() = delete;
-    Tree(const Tree &other) = default;
-    Tree(Tree &&other) = default;
-
     explicit Tree(Node node) : m_node{std::move(node)} {}
+
+    auto operator==(const Tree& lhs) -> bool;
 
     template <typename T>
     auto accept(Visitor<T> &v) {

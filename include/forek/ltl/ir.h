@@ -6,6 +6,7 @@ namespace forek::ir {
 template <typename Subtree>
 struct Globally : public Unary<Subtree> {
     using Unary<Subtree>::Unary;
+    using Unary<Subtree>::operator==;
 
     template <typename V>
     auto accept(V &visitor) const {
@@ -16,6 +17,7 @@ struct Globally : public Unary<Subtree> {
 template <typename Subtree>
 struct Finally : public Unary<Subtree> {
     using Unary<Subtree>::Unary;
+    using Unary<Subtree>::operator==;
 
     template <typename V>
     auto accept(V &visitor) const {
@@ -26,6 +28,7 @@ struct Finally : public Unary<Subtree> {
 template <typename Subtree>
 struct Next : public Unary<Subtree> {
     using Unary<Subtree>::Unary;
+    using Unary<Subtree>::operator==;
 
     template <typename V>
     auto accept(V &visitor) const {
@@ -36,6 +39,7 @@ struct Next : public Unary<Subtree> {
 template <typename Subtree>
 struct Release : public Binary<Subtree> {
     using Binary<Subtree>::Binary;
+    using Binary<Subtree>::operator==;
 
     template <typename V>
     auto accept(V &visitor) const {
@@ -46,6 +50,7 @@ struct Release : public Binary<Subtree> {
 template <typename Subtree>
 struct Until : public Binary<Subtree> {
     using Binary<Subtree>::Binary;
+    using Binary<Subtree>::operator==;
 
     template <typename V>
     auto accept(V &visitor) const {

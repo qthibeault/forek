@@ -106,7 +106,7 @@ class Builder : public LinearTemporalLogicParserVisitor {
     }
 };
 
-auto parse_ltl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
+auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = LinearTemporalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -127,8 +127,10 @@ auto parse_ltl_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(std::string_view formula) : m_root{parse_ltl_formula(formula)} {}
+Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 
-}  // namespace forek::ltl
+auto Formula::operator==(const Formula &lhs) -> bool { return *m_root == *lhs.m_root; }
+auto Tree::operator==(const Tree &lhs) -> bool { return m_node == lhs.m_node; }
 
+}  // namespace forek::ltl
