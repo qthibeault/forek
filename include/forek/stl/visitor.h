@@ -8,7 +8,7 @@
 namespace forek::stl {
 
 template <typename T>
-class Visitor : public virtual mtl::Visitor<T> {
+class Visitor : public mtl::Visitor<T> {
     using Expr = algebra::Expr;
     using Comparison = algebra::Comparison;
 
