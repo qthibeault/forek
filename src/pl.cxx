@@ -19,6 +19,7 @@ using forek::PropositionalLogicParser;
 using forek::PropositionalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
+using forek::common::StringBuilder;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -78,33 +79,6 @@ class Builder : public PropositionalLogicParserVisitor {
 
     auto visitPlIff(PropositionalLogicParser::PlIffContext *ctx) -> std::any override {
         return make_binary<Equivalence, Tree>(visit(ctx->formula(0)), visit(ctx->formula(1)));
-    }
-};
-
-class StringBuilder : public Visitor<std::string> {
-   public:
-    auto visit_true() -> std::string override { return "true"; }
-    auto visit_false() -> std::string override { return "false"; }
-    auto visit_proposition(std::string name) -> std::string override { return name; }
-
-    auto visit_negation(std::string inner) -> std::string override {
-        return fmt::format("not {}", inner);
-    }
-
-    auto visit_conjunction(std::string left, std::string right) -> std::string override {
-        return fmt::format("({}) and ({})", left, right);
-    }
-
-    auto visit_disjunction(std::string left, std::string right) -> std::string override {
-        return fmt::format("({}) or ({})", left, right);
-    }
-
-    auto visit_implication(std::string ante, std::string cons) -> std::string override {
-        return fmt::format("({}) implies ({})", ante, cons);
-    }
-
-    auto visit_equivalence(std::string ante, std::string cons) -> std::string override {
-        return fmt::format("({}) iff ({})", ante, cons);
     }
 };
 
