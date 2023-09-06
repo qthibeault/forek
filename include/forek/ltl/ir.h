@@ -57,4 +57,5 @@ struct Until : public Binary<Subtree> {
         return visitor.visit_until(this->m_left->accept(visitor), this->m_right->accept(visitor));
     }
 };
+
 }  // namespace forek::ir

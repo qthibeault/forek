@@ -16,7 +16,7 @@ class Formula {
     explicit Formula(std::shared_ptr<Tree> tree);
 
     template <typename T>
-    auto evalute(Visitor<T>& v) -> T {
+    auto evalute(Visitor<T>& v) const -> T {
         return m_root->accept(v);
     }
 };

@@ -15,7 +15,7 @@ class Formula {
     explicit Formula(Tree root);
 
     template <typename T>
-    auto evaluate(Visitor<T>& v) -> T {
+    auto evaluate(Visitor<T>& v) const -> T {
         return m_root->accept(v);
     }
 };

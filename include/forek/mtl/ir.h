@@ -23,7 +23,7 @@ struct BoundedNext : public BoundedUnary<Subtree> {
     using BoundedUnary<Subtree>::BoundedUnary;
 
     template <typename V>
-    auto accept(V &visitor) {
+    auto accept(V &visitor) const {
         return this->m_inner.visit_bounded_next(this->m_interval, this->m_inner->accept(visitor));
     }
 };

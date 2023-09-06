@@ -22,7 +22,7 @@ class Tree {
     auto operator==(const Tree &tree) const -> bool;
 
     template <typename T>
-    auto accept(forek::pl::Visitor<T> &visitor) -> T {
+    auto accept(forek::pl::Visitor<T> &visitor) const -> T {
         return std::visit([&visitor](const auto &node) { return node.accept(visitor); }, m_node);
     }
 };

@@ -22,7 +22,7 @@ class Tree {
     explicit Tree(Node node) : m_inner{std::move(node)} {}
 
     template <typename T>
-    auto accept(Visitor<T>& v) -> T {
+    auto accept(Visitor<T>& v) const -> T {
         std::visit([&v](const auto& inner) { return inner.accept(v); }, m_inner);
     }
 };

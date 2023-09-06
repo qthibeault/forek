@@ -17,7 +17,7 @@ class Formula {
     auto operator==(const Formula& lhs) -> bool;
 
     template <typename T>
-    auto evaluate(Visitor<T> &v) {
+    auto evaluate(Visitor<T> &v) const {
         return m_root->accept(v);
     }
 };

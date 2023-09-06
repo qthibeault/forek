@@ -22,7 +22,7 @@ class Tree {
     auto operator==(const Tree& lhs) -> bool;
 
     template <typename T>
-    auto accept(Visitor<T> &v) {
+    auto accept(Visitor<T> &v) const {
         return std::visit([&v](const auto &node) { return node.accept(v); }, m_node);
     }
 };
