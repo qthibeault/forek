@@ -3,6 +3,7 @@
 #include "forek/pl/ir.h"
 
 namespace forek::ir {
+
 template <typename Subtree>
 struct Globally : public Unary<Subtree> {
     using Unary<Subtree>::Unary;
