@@ -23,7 +23,7 @@ class Tree {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        std::visit([&v](const auto& inner) { return inner.accept(v); }, m_inner);
+        return std::visit([&v](const auto& inner) { return inner.accept(v); }, m_inner);
     }
 };
 }  // namespace forek::mtl
