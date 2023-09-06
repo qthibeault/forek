@@ -6,12 +6,14 @@
 #include <string>
 
 #include "forek/interval.h"
+#include "forek/stl/visitor.h"
 
 namespace forek::common {
 
 using interval::Interval;
 using interval::make_exclusive;
 using interval::make_inclusive;
+using stl::Visitor;
 
 template <template <typename> typename Op, typename Tree>
 auto make_unary(std::any inner) -> std::shared_ptr<Tree> {
@@ -52,4 +54,33 @@ auto make_interval(T* ctx) -> Interval {
 
     return Interval{lower, upper};
 }
+
+class StringBuilder : public Visitor<std::string> {
+   private:
+    using Interval = interval::Interval;
+    using Expr = algebra::Expr;
+    using Comparison = algebra::Comparison;
+
+   public:
+    auto visit_true() -> std::string override;
+    auto visit_false() -> std::string override;
+    auto visit_proposition(std::string name) -> std::string override;
+    auto visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> std::string override;
+    auto visit_negation(std::string inner) -> std::string override;
+    auto visit_conjunction(std::string left, std::string right) -> std::string override;
+    auto visit_disjunction(std::string left, std::string right) -> std::string override;
+    auto visit_implication(std::string ante, std::string cons) -> std::string override;
+    auto visit_equivalence(std::string ante, std::string cons) -> std::string override;
+    auto visit_next(std::string inner) -> std::string override;
+    auto visit_globally(std::string inner) -> std::string override;
+    auto visit_finally(std::string inner) -> std::string override;
+    auto visit_until(std::string left, std::string right) -> std::string override;
+    auto visit_release(std::string left, std::string right) -> std::string override;
+    auto visit_bounded_next(const Interval& i, std::string inner) -> std::string override;
+    auto visit_bounded_globally(const Interval& i, std::string inner) -> std::string override;
+    auto visit_bounded_finally(const Interval& i, std::string inner) -> std::string override;
+    auto visit_bounded_until(const Interval& i, std::string left, std::string right) -> std::string override;
+    auto visit_bounded_release(const Interval& i, std::string left, std::string right) -> std::string override;
+};
+
 }  // namespace forek::common
