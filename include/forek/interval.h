@@ -4,7 +4,10 @@
 #include <string>
 #include <variant>
 
+#include "fmt/core.h"
+
 namespace forek::interval {
+
 class Inclusive {
     double m_value;
 
@@ -79,4 +82,18 @@ class ZeroLengthInterval : std::exception {
 
 auto make_inclusive(double value) -> Endpoint;
 auto make_exclusive(double value) -> Endpoint;
+
 }  // namespace forek::interval
+
+namespace fmt {
+
+template <>
+struct fmt::formatter<forek::interval::Interval> {
+    constexpr auto parse(format_parse_context &ctx) -> format_parse_context::iterator {
+        return ctx.begin();
+    }
+
+    auto format(const forek::interval::Interval &i, format_context &ctx) -> format_context::iterator;
+};
+
+}  // namespace fmt

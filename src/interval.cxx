@@ -26,26 +26,18 @@ Interval::Interval(Endpoint lower, Endpoint upper)
     }
 }
 
-template <>
-struct fmt::formatter<Interval> {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext &ctx) {
-        return ctx.begin();
-    }
+auto fmt::formatter<Interval>::format(const Interval &i, format_context &ctx)
+    -> format_context::iterator {
+    auto open_visitor = OpenSymbolVisitor{};
+    auto open = i.lower().visit(open_visitor);
+    auto start = i.lower().value();
 
-    template <typename FormatContext>
-    auto format(const Interval &i, FormatContext &ctx) {
-        auto open_visitor = OpenSymbolVisitor{};
-        auto open = i.lower().visit(open_visitor);
-        auto start = i.lower().value();
+    auto close_visitor = CloseSymbolVisitor{};
+    auto close = i.upper().visit(close_visitor);
+    auto end = i.upper().value();
 
-        auto close_visitor = CloseSymbolVisitor{};
-        auto close = i.upper().visit(close_visitor);
-        auto end = i.upper().value();
-
-        return fmt::format_to(ctx.out(), "{}{},{}{}", open, start, end, close);
-    }
-};
+    return fmt::format_to(ctx.out(), "{}{},{}{}", open, start, end, close);
+}
 
 Interval::operator std::string() const { return fmt::format("{}", *this); }
 
