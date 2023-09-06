@@ -24,7 +24,7 @@ struct BoundedNext : public BoundedUnary<Subtree> {
 
     template <typename V>
     auto accept(V &visitor) const {
-        return this->m_inner.visit_bounded_next(this->m_interval, this->m_inner->accept(visitor));
+        return visitor.visit_bounded_next(this->m_interval, this->m_inner->accept(visitor));
     }
 };
 
@@ -34,8 +34,7 @@ struct BoundedGlobally : public BoundedUnary<Subtree> {
 
     template <typename V>
     auto accept(V &visitor) const {
-        return this->m_inner.visit_bounded_globally(this->m_interval,
-                                                    this->m_inner->accept(visitor));
+        return visitor.visit_bounded_globally(this->m_interval, this->m_inner->accept(visitor));
     }
 };
 
@@ -45,8 +44,7 @@ struct BoundedFinally : public BoundedUnary<Subtree> {
 
     template <typename V>
     auto accept(V &visitor) const {
-        return this->m_inner.visit_bounded_finally(this->m_interval,
-                                                   this->m_inner->accept(visitor));
+        return visitor.visit_bounded_finally(this->m_interval, this->m_inner->accept(visitor));
     }
 };
 
