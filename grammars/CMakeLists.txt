@@ -89,3 +89,18 @@ PARSER(SignalTemporalLogic LIBRARY_NAME stl_parser)
 PARSER(TimedPropositionalTemporalLogic LIBRARY_NAME tptl_parser)
 PARSER(TimedQualityTemporalLogic LIBRARY_NAME tqtl_parser)
 PARSER(SpatioTemporalPerceptionLogic LIBRARY_NAME stpl_parser)
+
+add_library(forek_parsers INTERFACE)
+
+target_link_libraries(forek_parsers INTERFACE
+    arithmetic_parser $<TARGET_OBJECTS:arithmetic_parser>
+    pl_parser $<TARGET_OBJECTS:pl_parser>
+    ltl_parser $<TARGET_OBJECTS:ltl_parser>
+    pt_ltl_parser $<TARGET_OBJECTS:pt_ltl_parser>
+    mtl_parser $<TARGET_OBJECTS:mtl_parser>
+    stl_parser $<TARGET_OBJECTS:stl_parser>
+    tptl_parser $<TARGET_OBJECTS:tptl_parser>
+    tqtl_parser $<TARGET_OBJECTS:tqtl_parser>
+    stpl_parser $<TARGET_OBJECTS:stpl_parser>)
+
+add_library(forek::parsers ALIAS forek_parsers)

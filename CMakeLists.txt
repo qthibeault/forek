@@ -42,15 +42,7 @@ target_include_directories(forek PUBLIC
     include)
 
 target_link_libraries(forek PRIVATE
-    arithmetic_parser
-    pl_parser
-    ltl_parser
-    pt_ltl_parser
-    mtl_parser
-    stl_parser
-    tptl_parser
-    tqtl_parser
-    stpl_parser
+    forek::parsers
     fmt::fmt-header-only)
 
 target_compile_features(forek PUBLIC cxx_std_17)
@@ -69,3 +61,5 @@ if(FOREK_ENABLE_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+add_subdirectory(python)
