@@ -18,8 +18,8 @@ class Visitor : public virtual pl::Visitor<T> {
     virtual auto visit_globally(T inner) -> T = 0;
     virtual auto visit_finally(T inner) -> T = 0;
     virtual auto visit_next(T inner) -> T = 0;
-    virtual auto visit_release(T inner) -> T = 0;
-    virtual auto visit_until(T inner) -> T = 0;
+    virtual auto visit_release(T left, T right) -> T = 0;
+    virtual auto visit_until(T left, T right) -> T = 0;
 };
 
 template <typename T>
