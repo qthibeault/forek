@@ -29,7 +29,7 @@ struct Predicate {
 
     template <typename V>
     auto accept(V& visitor) const -> decltype(auto) {
-        visitor.visit_predicate(m_left, m_cmp, m_right);
+        visitor.visit_predicate(*m_left, m_cmp, *m_right);
     }
 };
 }  // namespace forek::ir
