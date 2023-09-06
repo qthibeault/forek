@@ -18,6 +18,7 @@ using forek::LinearTemporalLogicParser;
 using forek::LinearTemporalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_unary;
+using forek::common::StringBuilder;
 using forek::ir::Conjunction;
 using forek::ir::Disjunction;
 using forek::ir::Equivalence;
@@ -129,6 +130,11 @@ auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 
 Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+Formula::operator std::string() {
+    StringBuilder sb;
+    return this->evaluate(sb);
+}
 
 auto Formula::operator==(const Formula &lhs) -> bool { return *m_root == *lhs.m_root; }
 auto Tree::operator==(const Tree &lhs) -> bool { return m_node == lhs.m_node; }

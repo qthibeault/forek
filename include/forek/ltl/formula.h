@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <string_view>
 
 #include "forek/ltl/tree.h"
@@ -15,6 +16,7 @@ class Formula {
     explicit Formula(Tree root);
 
     auto operator==(const Formula& lhs) -> bool;
+    explicit operator std::string();
 
     template <typename T>
     auto evaluate(Visitor<T> &v) const -> T {
