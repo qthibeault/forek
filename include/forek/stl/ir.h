@@ -11,6 +11,7 @@
 #include "forek/mtl/ir.h"
 
 namespace forek::ir {
+
 struct Predicate {
     using Expr = algebra::Expr;
     using Comparison = algebra::Comparison;
@@ -28,8 +29,9 @@ struct Predicate {
         : m_left{std::move(left)}, m_cmp{cmp}, m_right{std::move(right)} {}
 
     template <typename V>
-    auto accept(V& visitor) const -> decltype(auto) {
-        visitor.visit_predicate(*m_left, m_cmp, *m_right);
+    auto accept(V& visitor) const {
+        return visitor.visit_predicate(*m_left, m_cmp, *m_right);
     }
 };
+
 }  // namespace forek::ir
