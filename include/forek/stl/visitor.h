@@ -6,6 +6,7 @@
 #include "forek/mtl/visitor.h"
 
 namespace forek::stl {
+
 template <typename T>
 class Visitor : public virtual mtl::Visitor<T> {
     using Expr = algebra::Expr;
@@ -13,14 +14,14 @@ class Visitor : public virtual mtl::Visitor<T> {
 
    public:
     Visitor() = default;
-    Visitor(const Visitor&) = default;
-    Visitor(Visitor&&) = default;
+    Visitor(const Visitor<T>&) = default;
+    Visitor(Visitor<T>&&) = default;
 
-    auto operator=(const Visitor&) -> Visitor& = default;
-    auto operator=(Visitor&&) -> Visitor& = default;
-
-    auto visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> T = 0;
+    auto operator=(const Visitor<T>&) -> Visitor<T>& = default;
+    auto operator=(Visitor<T>&&) -> Visitor<T>& = default;
 
     virtual ~Visitor() = default;
+    virtual auto visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> T = 0;
 };
+
 }  // namespace forek::stl
