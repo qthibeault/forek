@@ -5,7 +5,7 @@
 namespace forek::ltl {
 
 template <typename T>
-class Visitor : public virtual pl::Visitor<T> {
+class Visitor : public pl::Visitor<T> {
    public:
     Visitor() = default;
     Visitor(const Visitor<T>&) = default;
