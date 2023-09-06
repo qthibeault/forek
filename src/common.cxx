@@ -10,7 +10,7 @@ namespace forek::common {
     auto StringBuilder::visit_false() -> std::string { return "False"; }
     auto StringBuilder::visit_proposition(std::string name) -> std::string { return name; }
 
-    auto visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> std::string {
+    auto StringBuilder::visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> std::string {
         return "";
     }
 
