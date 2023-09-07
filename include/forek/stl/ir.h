@@ -28,6 +28,8 @@ struct Predicate {
     Predicate(std::shared_ptr<Expr> left, Comparison cmp, std::shared_ptr<Expr> right)
         : m_left{std::move(left)}, m_cmp{cmp}, m_right{std::move(right)} {}
 
+    auto operator==(const Predicate& lhs) const -> bool;
+
     template <typename V>
     auto accept(V& visitor) const {
         return visitor.visit_predicate(*m_left, m_cmp, *m_right);
