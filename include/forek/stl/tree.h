@@ -21,6 +21,8 @@ class Tree {
    public:
     explicit Tree(Node node) : m_node(std::move(node)) {}
 
+    auto operator==(const Tree& lhs) -> bool;
+
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
         return std::visit([&v](const auto& node) { return node.accept(v); }, m_node);
