@@ -131,12 +131,12 @@ auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 
-Formula::operator std::string() {
+Formula::operator std::string() const {
     StringBuilder sb;
     return this->evaluate(sb);
 }
 
-auto Formula::operator==(const Formula &lhs) -> bool { return *m_root == *lhs.m_root; }
-auto Tree::operator==(const Tree &lhs) -> bool { return m_node == lhs.m_node; }
+auto Formula::operator==(const Formula &lhs) const -> bool { return *m_root == *lhs.m_root; }
+auto Tree::operator==(const Tree &lhs) const -> bool { return m_node == lhs.m_node; }
 
 }  // namespace forek::ltl

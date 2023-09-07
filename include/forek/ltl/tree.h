@@ -19,7 +19,7 @@ class Tree {
    public:
     explicit Tree(Node node) : m_node{std::move(node)} {}
 
-    auto operator==(const Tree& lhs) -> bool;
+    auto operator==(const Tree& lhs) const -> bool;
 
     template <typename T>
     auto accept(Visitor<T> &v) const -> T {
