@@ -47,7 +47,9 @@ using forek::ir::Until;
 using forek::mtl::Formula;
 using forek::mtl::Tree;
 
-class MTLBuilder : public MetricTemporalLogicParserVisitor {
+namespace forek::mtl {
+
+class Builder : public MetricTemporalLogicParserVisitor {
     using Parser = MetricTemporalLogicParser;
 
     auto visitStart(Parser::StartContext *ctx) -> std::any override {
@@ -156,7 +158,7 @@ class MTLBuilder : public MetricTemporalLogicParserVisitor {
     }
 };
 
-auto parse_mtl_formula(std::string formula) -> std::shared_ptr<Tree> {
+auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = MetricTemporalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -171,11 +173,14 @@ auto parse_mtl_formula(std::string formula) -> std::shared_ptr<Tree> {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = MTLBuilder{};
+    auto builder = Builder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
-Formula::Formula(std::string formula) : m_root{parse_mtl_formula(std::move(formula))} {}
-Formula::Formula(Tree root) { this->m_root = std::make_shared<Tree>(std::move(root)); }
+Formula::Formula(std::string_view formula) : m_root{parse_formula(std::move(formula))} {}
+Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+}  // namespace forek::mtl
+
