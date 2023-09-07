@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
 
@@ -7,6 +8,7 @@
 #include "forek/ltl/visitor.h"
 
 namespace forek::ltl {
+
 class Formula {
    private:
     std::shared_ptr<Tree> m_root;
@@ -28,4 +30,5 @@ class PastTimeFormula {
    public:
     explicit PastTimeFormula(std::string formula);
 };
+
 }  // namespace forek::ltl
