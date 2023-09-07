@@ -17,7 +17,7 @@ class BoundedUnary : public Unary<Subtree> {
     BoundedUnary(Interval i, std::shared_ptr<Subtree> inner)
         : Unary<Subtree>(std::move(inner)), m_interval{std::move(i)} {}
 
-    auto operator==(const BoundedUnary<Subtree> &lhs) -> bool {
+    auto operator==(const BoundedUnary<Subtree> &lhs) const -> bool {
         return this->m_interval == lhs.m_interval && Unary<Subtree>::operator==(lhs);
     }
 };
@@ -65,7 +65,7 @@ class BoundedBinary : public Binary<Subtree> {
     BoundedBinary(Interval i, std::shared_ptr<Subtree> left, std::shared_ptr<Subtree> right)
         : Binary<Subtree>(std::move(left), std::move(right)), m_interval{std::move(i)} {}
 
-    auto operator==(const BoundedBinary<Subtree> &lhs) -> bool {
+    auto operator==(const BoundedBinary<Subtree> &lhs) const -> bool {
         return this->m_interval == lhs.m_interval && Binary<Subtree>::operator==(lhs);
     }
 };
