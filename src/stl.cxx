@@ -58,7 +58,9 @@ using forek::stl::Tree;
 using TreePtr = std::shared_ptr<Tree>;
 using ExprPtr = std::shared_ptr<Expr>;
 
-class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
+namespace forek::stl {
+
+class Builder : public SignalTemporalLogicParserBaseVisitor {
     using Parser = SignalTemporalLogicParser;
 
    public:
@@ -244,7 +246,7 @@ class STLBuilder : public SignalTemporalLogicParserBaseVisitor {
     }
 };
 
-auto parse_stl_formula(std::string formula) -> TreePtr {
+auto parse_formula(std::string_view formula) -> TreePtr {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = SignalTemporalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -259,12 +261,15 @@ auto parse_stl_formula(std::string formula) -> TreePtr {
     parser.removeErrorListeners();
     parser.addErrorListener(parser_listener.get());
 
-    auto builder = STLBuilder{};
+    auto builder = Builder{};
     auto output = builder.visit(parser.start());
 
     return std::any_cast<TreePtr>(output);
 }
 
-Formula::Formula(std::string formula) : m_root{parse_stl_formula(std::move(formula))} {}
+Formula::Formula(std::string_view formula) : m_root{parse_formula(std::move(formula))} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 Formula::Formula(std::shared_ptr<Tree> root) : m_root{std::move(root)} {}
+
+}  // namespace forek::stl
+
