@@ -1,8 +1,8 @@
 #pragma once
 
+#include <memory>
 #include <string>
 #include <string_view>
-#include <type_traits>
 
 #include "forek/pl/tree.h"
 #include "forek/pl/visitor.h"
@@ -20,6 +20,7 @@ class Formula {
     explicit operator std::string() const;
 
     auto operator==(const Formula&) const -> bool;
+    explicit operator std::string();
 
     template <typename T>
     auto evaluate(Visitor<T>& v) const -> T {
