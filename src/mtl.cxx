@@ -20,6 +20,7 @@ using forek::MetricTemporalLogicParserVisitor;
 using forek::common::make_binary;
 using forek::common::make_interval;
 using forek::common::make_unary;
+using forek::common::StringBuilder;
 using forek::listeners::LexerErrorListener;
 using forek::listeners::ParserErrorListener;
 using forek::interval::Endpoint;
@@ -181,6 +182,19 @@ auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 
 Formula::Formula(std::string_view formula) : m_root{parse_formula(std::move(formula))} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
+
+Formula::operator std::string() const {
+    StringBuilder sb;
+    return this->evaluate(sb);
+}
+
+auto Formula::operator==(const Formula& lhs) const -> bool {
+    return *this->m_root == *lhs.m_root;
+}
+
+auto Tree::operator==(const Tree& lhs) const -> bool {
+    return this->m_inner == lhs.m_inner;
+}
 
 }  // namespace forek::mtl
 
