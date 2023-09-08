@@ -30,6 +30,7 @@ using forek::algebra::Variable;
 using forek::common::make_binary;
 using forek::common::make_interval;
 using forek::common::make_unary;
+using forek::common::StringBuilder;
 using forek::interval::Interval;
 using forek::ir::BoundedFinally;
 using forek::ir::BoundedGlobally;
@@ -270,6 +271,19 @@ auto parse_formula(std::string_view formula) -> TreePtr {
 Formula::Formula(std::string_view formula) : m_root{parse_formula(std::move(formula))} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 Formula::Formula(std::shared_ptr<Tree> root) : m_root{std::move(root)} {}
+
+Formula::operator std::string() const {
+    StringBuilder sb;
+    return this->evaluate(sb);
+}
+
+auto Formula::operator==(const Formula& lhs) const -> bool {
+    return *m_root == *lhs.m_root;
+}
+
+auto Tree::operator==(const Tree& lhs) const -> bool {
+    return m_node == lhs.m_node;
+}
 
 }  // namespace forek::stl
 
