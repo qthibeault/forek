@@ -107,8 +107,8 @@ Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 
 Formula::operator std::string() const {
-    StringBuilder builder;
-    return this->evaluate(builder);
+    StringBuilder sb;
+    return this->evaluate(sb);
 }
 
 auto Formula::operator==(const Formula &tree) const -> bool { return *m_root == *tree.m_root; }
