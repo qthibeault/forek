@@ -1,14 +1,66 @@
-#include "forek/algebra.h"
+#include "forek/algebra/visitor.h"
+#include "forek/algebra/ast.h"
+#include "forek/algebra/expr.h"
+#include "forek/algebra/canonical_sum.h"
 
 #include <stdexcept>
 
-using forek::algebra::Expr;
-using forek::algebra::Sum;
-using forek::algebra::UnsupportedOperationException;
-using forek::algebra::Visitor;
+namespace forek::algebra {
 
-Sum::Sum() : m_constant{0.0}, m_coefficients{} {}
-Sum::Sum(std::initializer_list<Term> terms) : m_constant{0.0}, m_coefficients{} {
+Literal::Literal(double value) : m_value{value} {}
+
+auto Literal::operator==(const Literal& rhs) const -> bool {
+    return m_value == rhs.m_value;
+}
+
+auto Literal::value() const -> double {
+    return m_value;
+}
+
+Variable::Variable(std::string name) : m_name{std::move(name)} {}
+
+auto Variable::operator==(const Variable& rhs) const -> bool {
+    return m_name == rhs.m_name;
+}
+
+auto Variable::name() const -> std::string_view {
+    return m_name;
+}
+
+Expr::Expr(Node node) : m_node{std::move(node)} {}
+
+auto Expr::operator==(const Expr& rhs) const -> bool {
+    return m_node == rhs.m_node;
+}
+
+auto Expr::is_value() const -> bool {
+    return is_type<Literal>() || is_type<Variable>();
+}
+
+auto Expr::is_operator() const -> bool {
+    return is_type<Add>() || is_type<Sub>() || is_type<Mult>() || is_type<Div>() || is_type<Mod>();
+}
+
+struct Sum::Term {
+    double m_scalar;
+    std::optional<std::string> m_name;
+
+    Term(double scalar)  // NOLINT: google-explicit-constructors
+        : m_scalar{scalar}, m_name{std::nullopt} {}
+
+    Term(std::string_view name)  // NOLINT: google-explicit-constructors
+        : m_scalar{1.0}, m_name{name} {}
+
+    Term(double scalar, std::string_view name)
+        : m_scalar{scalar}, m_name{name} {}
+
+    Term(std::string_view name, double scalar)
+        : m_scalar{scalar}, m_name{name} {}
+};
+
+Sum::Sum() = default;
+
+Sum::Sum(std::initializer_list<Term> terms) {
     for (auto term : terms) {
         if (term.m_name) {
             add_term(*term.m_name, term.m_scalar);
@@ -16,6 +68,53 @@ Sum::Sum(std::initializer_list<Term> terms) : m_constant{0.0}, m_coefficients{} 
             add_term(term.m_scalar);
         }
     }
+}
+
+struct Sum::Builder : public Visitor<Sum> {
+    auto visit_addition(Sum lhs, Sum rhs) -> Sum override {
+        lhs += rhs;
+        return lhs;
+    }
+
+    auto visit_subtraction(Sum lhs, Sum rhs) -> Sum override {
+        lhs -= rhs;
+        return lhs;
+    }
+
+    auto visit_multiplication(Sum lhs, Sum rhs) -> Sum override {
+        if (!rhs.has_coefficients()) {
+            lhs *= rhs.constant();
+            return lhs;
+        }
+
+        if (!lhs.has_coefficients()) {
+            rhs *= lhs.constant();
+            return rhs;
+        }
+
+        throw std::runtime_error{"bad"};
+    }
+
+    auto visit_division(Sum lhs, Sum rhs) -> Sum override {
+        if (!rhs.has_coefficients()) {
+            lhs *= (1.0 / rhs.constant());
+            return lhs;
+        }
+
+        throw std::runtime_error{"bad"};
+    }
+
+    auto visit_modulo(Sum, Sum) -> Sum override { throw UnsupportedOperationException{}; }
+    auto visit_variable(std::string_view name) -> Sum override { return Sum{name}; }
+    auto visit_value(double value) -> Sum override { return Sum{value}; }
+};
+
+Sum::Sum(const Expr& expr) {
+    Builder b;
+    auto s = expr.accept(b);
+
+    this->m_constant = s.m_constant;
+    this->m_coefficients = std::move(s.m_coefficients);
 }
 
 auto Sum::operator+=(const Sum& rhs) -> Sum& {
@@ -65,46 +164,16 @@ auto Sum::add_term(double constant) -> Sum& {
     return *this;
 }
 
-struct SumVisitor : public Visitor<Sum> {
-    auto visit_addition(Sum lhs, Sum rhs) -> Sum override {
-        lhs += rhs;
-        return lhs;
-    }
-
-    auto visit_subtraction(Sum lhs, Sum rhs) -> Sum override {
-        lhs -= rhs;
-        return lhs;
-    }
-
-    auto visit_multiplication(Sum lhs, Sum rhs) -> Sum override {
-        if (!rhs.has_coefficients()) {
-            lhs *= rhs.constant();
-            return lhs;
-        }
-
-        if (!lhs.has_coefficients()) {
-            rhs *= lhs.constant();
-            return rhs;
-        }
-
-        throw std::runtime_error{"bad"};
-    }
-
-    auto visit_division(Sum lhs, Sum rhs) -> Sum override {
-        if (!rhs.has_coefficients()) {
-            lhs *= (1.0 / rhs.constant());
-            return lhs;
-        }
-
-        throw std::runtime_error{"bad"};
-    }
-
-    auto visit_modulo(Sum lhs, Sum rhs) -> Sum override { throw UnsupportedOperationException{}; }
-    auto visit_variable(std::string name) -> Sum override { return Sum{std::move(name)}; }
-    auto visit_value(double value) -> Sum override { return Sum{value}; }
-};
-
-auto forek::algebra::canonical_sum(const Expr& expr) -> Sum {
-    SumVisitor visitor;
-    return expr.evaluate(visitor);
+auto Sum::has_coefficients() const -> bool {
+    return m_coefficients.size() > 0;
 }
+
+auto Sum::has_constant() const -> bool {
+    return m_constant != 0.0;
+}
+
+auto Sum::constant() const -> double {
+    return m_constant;
+}
+
+}  // namespace forek::algebra
