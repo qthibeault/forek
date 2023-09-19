@@ -59,6 +59,14 @@ using forek::stl::Tree;
 using TreePtr = std::shared_ptr<Tree>;
 using ExprPtr = std::shared_ptr<Expr>;
 
+namespace forek::ir {
+
+auto Predicate::operator==(const Predicate& lhs) const -> bool {
+    return *m_left == *lhs.m_left && m_cmp == lhs.m_cmp && *m_right == *lhs.m_right;
+}
+
+}  // namespace forek::ir
+
 namespace forek::stl {
 
 class Builder : public SignalTemporalLogicParserBaseVisitor {
