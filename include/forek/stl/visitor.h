@@ -8,11 +8,11 @@
 namespace forek::stl {
 
 template <typename T>
-class Visitor : public mtl::Visitor<T> {
+class Visitor : public virtual mtl::Visitor<T> {
+   public:
     using Expr = algebra::Expr;
     using Comparison = algebra::Comparison;
 
-   public:
     Visitor() = default;
     Visitor(const Visitor<T>&) = default;
     Visitor(Visitor<T>&&) = default;

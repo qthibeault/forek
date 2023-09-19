@@ -6,11 +6,10 @@
 namespace forek::mtl {
 
 template <typename T>
-class Visitor : public ltl::Visitor<T> {
-   private:
+class Visitor : public virtual ltl::Visitor<T> {
+   public:
     using Interval = interval::Interval;
 
-   public:
     Visitor() = default;
     Visitor(const Visitor<T>&) = default;
     Visitor(Visitor<T>&&) = default;
