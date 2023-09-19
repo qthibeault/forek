@@ -30,6 +30,7 @@ add_subdirectory(grammars)
 
 add_library(forek STATIC
     src/interval.cxx
+    src/algebra.cxx
     src/common.cxx
     src/pl.cxx
     src/ltl.cxx
