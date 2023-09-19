@@ -13,7 +13,6 @@ namespace forek::common {
 using interval::Interval;
 using interval::make_exclusive;
 using interval::make_inclusive;
-using stl::Visitor;
 
 template <template <typename> typename Op, typename Tree>
 auto make_unary(std::any inner) -> std::shared_ptr<Tree> {
@@ -55,12 +54,7 @@ auto make_interval(T* ctx) -> Interval {
     return Interval{lower, upper};
 }
 
-class StringBuilder : public Visitor<std::string> {
-   private:
-    using Interval = interval::Interval;
-    using Expr = algebra::Expr;
-    using Comparison = algebra::Comparison;
-
+class StringBuilder : public stl::Visitor<std::string> {
    public:
     auto visit_true() -> std::string override;
     auto visit_false() -> std::string override;
