@@ -53,11 +53,6 @@ using forek::ir::True;
 using forek::ir::Until;
 using forek::listeners::LexerErrorListener;
 using forek::listeners::ParserErrorListener;
-using forek::stl::Formula;
-using forek::stl::Tree;
-
-using TreePtr = std::shared_ptr<Tree>;
-using ExprPtr = std::shared_ptr<Expr>;
 
 namespace forek::ir {
 
@@ -152,9 +147,9 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
         auto left = visit(ctx->expression(0));
         auto right = visit(ctx->expression(1));
 
-        return std::make_shared<Tree>(Predicate{std::any_cast<ExprPtr>(left),
+        return std::make_shared<Tree>(Predicate{std::any_cast<std::shared_ptr<Expr>>(left),
                                                 std::any_cast<Comparison>(op),
-                                                std::any_cast<ExprPtr>(right)});
+                                                std::any_cast<std::shared_ptr<Expr>>(right)});
     }
 
     auto visitProposition(Parser::PropositionContext *ctx) -> std::any override {
@@ -255,7 +250,7 @@ class Builder : public SignalTemporalLogicParserBaseVisitor {
     }
 };
 
-auto parse_formula(std::string_view formula) -> TreePtr {
+auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
     auto input_stream = antlr4::ANTLRInputStream(formula);
     auto lexer = SignalTemporalLogicLexer(&input_stream);
     auto lexer_listener = std::make_unique<LexerErrorListener>();
@@ -273,7 +268,7 @@ auto parse_formula(std::string_view formula) -> TreePtr {
     auto builder = Builder{};
     auto output = builder.visit(parser.start());
 
-    return std::any_cast<TreePtr>(output);
+    return std::any_cast<std::shared_ptr<Tree>>(output);
 }
 
 Formula::Formula(std::string_view formula) : m_root{parse_formula(std::move(formula))} {}
