@@ -10,9 +10,6 @@
 namespace forek::ltl {
 
 class Formula {
-   private:
-    std::shared_ptr<Tree> m_root;
-
    public:
     explicit Formula(std::string_view formula);
     explicit Formula(Tree root);
@@ -21,9 +18,12 @@ class Formula {
     explicit operator std::string() const;
 
     template <typename T>
-    auto evaluate(Visitor<T> &v) const -> T {
+    auto evaluate(Visitor<T>& v) const -> T {
         return m_root->accept(v);
     }
+
+   private:
+    std::shared_ptr<Tree> m_root;
 };
 
 class PastTimeFormula {
