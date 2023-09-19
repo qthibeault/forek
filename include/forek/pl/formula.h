@@ -17,10 +17,8 @@ class Formula {
     explicit Formula(std::string_view formula);
     explicit Formula(Tree root);
 
-    explicit operator std::string() const;
-
     auto operator==(const Formula&) const -> bool;
-    explicit operator std::string();
+    explicit operator std::string() const;
 
     template <typename T>
     auto evaluate(Visitor<T>& v) const -> T {
