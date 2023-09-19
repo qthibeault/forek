@@ -104,6 +104,7 @@ auto parse_formula(std::string_view formula) -> std::shared_ptr<Tree> {
 }
 
 Formula::Formula(std::string_view formula) : m_root{parse_formula(formula)} {}
+
 Formula::Formula(Tree root) : m_root{std::make_shared<Tree>(std::move(root))} {}
 
 Formula::operator std::string() const {
@@ -111,7 +112,17 @@ Formula::operator std::string() const {
     return this->evaluate(sb);
 }
 
-auto Formula::operator==(const Formula &tree) const -> bool { return *m_root == *tree.m_root; }
-auto Tree::operator==(const Tree &tree) const -> bool { return m_node == tree.m_node; }
+auto Formula::operator==(const Formula &tree) const -> bool {
+    return *m_root == *tree.m_root;
+}
+
+auto Tree::operator==(const Tree &tree) const -> bool {
+    return m_node == tree.m_node;
+}
+
+auto operator<<(std::ostream& os, const Formula& f) -> std::ostream& {
+    os << static_cast<std::string>(f);
+    return os;
+}
 
 }  // namespace forek::pl

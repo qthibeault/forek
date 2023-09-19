@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <ostream>
 #include <string>
 #include <string_view>
 
@@ -25,5 +26,7 @@ class Formula {
         return m_root->accept(v);
     }
 };
+
+auto operator<<(std::ostream& os, const Formula& f) -> std::ostream&;
 
 }  // namespace forek::pl

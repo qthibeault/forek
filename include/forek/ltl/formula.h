@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -25,6 +26,8 @@ class Formula {
    private:
     std::shared_ptr<Tree> m_root;
 };
+
+auto operator<<(std::ostream& os, const Formula& f) -> std::ostream&;
 
 class PastTimeFormula {
    public:

@@ -136,7 +136,17 @@ Formula::operator std::string() const {
     return this->evaluate(sb);
 }
 
-auto Formula::operator==(const Formula &lhs) const -> bool { return *m_root == *lhs.m_root; }
-auto Tree::operator==(const Tree &lhs) const -> bool { return m_node == lhs.m_node; }
+auto Formula::operator==(const Formula &lhs) const -> bool {
+    return *m_root == *lhs.m_root;
+}
+
+auto Tree::operator==(const Tree &lhs) const -> bool {
+    return m_node == lhs.m_node;
+}
+
+auto operator<<(std::ostream& os, const Formula& f) -> std::ostream& {
+    os << static_cast<std::string>(f);
+    return os;
+}
 
 }  // namespace forek::ltl

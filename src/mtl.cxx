@@ -196,5 +196,10 @@ auto Tree::operator==(const Tree& lhs) const -> bool {
     return this->m_inner == lhs.m_inner;
 }
 
+auto operator<<(std::ostream& os, const Formula& f) -> std::ostream& {
+    os << static_cast<std::string>(f);
+    return os;
+}
+
 }  // namespace forek::mtl
 
