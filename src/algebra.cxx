@@ -1,9 +1,11 @@
+#include <stdexcept>
+
+#include <fmt/format.h>
+
 #include "forek/algebra/visitor.h"
 #include "forek/algebra/ast.h"
 #include "forek/algebra/expr.h"
 #include "forek/algebra/canonical_sum.h"
-
-#include <stdexcept>
 
 namespace forek::algebra {
 
@@ -28,6 +30,42 @@ auto Variable::name() const -> std::string_view {
 }
 
 Expr::Expr(Node node) : m_node{std::move(node)} {}
+
+class StringBuilder : public Visitor<std::string> {
+   public:
+    auto visit_value(double value) -> std::string override {
+        return fmt::format("{}", value);
+    }
+
+    auto visit_variable(std::string_view name) -> std::string override {
+        return std::string{name};
+    }
+
+    auto visit_addition(std::string lhs, std::string rhs) -> std::string override {
+        return fmt::format("({}) + ({})", lhs, rhs);
+    }
+
+    auto visit_subtraction(std::string lhs, std::string rhs) -> std::string override {
+        return fmt::format("({}) - ({})", lhs, rhs);
+    }
+
+    auto visit_multiplication(std::string lhs, std::string rhs) -> std::string override {
+        return fmt::format("({}) * ({})", lhs, rhs);
+    }
+
+    auto visit_division(std::string lhs, std::string rhs) -> std::string override {
+        return fmt::format("({}) / ({})", lhs, rhs);
+    }
+
+    auto visit_modulo(std::string lhs, std::string rhs) -> std::string override {
+        return fmt::format("({}) % ({})", lhs, rhs);
+    }
+};
+
+Expr::operator std::string() const {
+    StringBuilder sb;
+    return this->accept(sb);
+}
 
 auto Expr::operator==(const Expr& rhs) const -> bool {
     return m_node == rhs.m_node;

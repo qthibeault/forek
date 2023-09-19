@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <utility>
 #include <variant>
 
@@ -17,6 +18,7 @@ class Expr {
     explicit Expr(Node node);
 
     auto operator==(const Expr& rhs) const -> bool;
+    explicit operator std::string() const;
 
     template <typename T>
     [[nodiscard]] auto is_type() const -> bool {
