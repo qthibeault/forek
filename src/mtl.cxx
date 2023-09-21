@@ -24,8 +24,6 @@ using forek::common::StringBuilder;
 using forek::listeners::LexerErrorListener;
 using forek::listeners::ParserErrorListener;
 using forek::interval::Endpoint;
-using forek::interval::Exclusive;
-using forek::interval::Inclusive;
 using forek::interval::Interval;
 using forek::ir::BoundedFinally;
 using forek::ir::BoundedGlobally;
