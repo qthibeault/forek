@@ -20,6 +20,9 @@ class Expr {
     auto operator==(const Expr& rhs) const -> bool;
     explicit operator std::string() const;
 
+    [[nodiscard]] auto is_value() const -> bool;
+    [[nodiscard]] auto is_operator() const -> bool;
+
     template <typename T>
     [[nodiscard]] auto is_type() const -> bool {
         return std::holds_alternative<T>(m_node);
@@ -31,12 +34,9 @@ class Expr {
     }
 
     template <typename T>
-    auto accept(Visitor<T>& v) const -> T {
+    auto evaluate(Visitor<T>& v) const -> T {
         return std::visit([&v](const auto& node) { return node.accept(v); }, m_node);
     }
-
-    [[nodiscard]] auto is_value() const -> bool;
-    [[nodiscard]] auto is_operator() const -> bool;
 
    private:
     Node m_node;

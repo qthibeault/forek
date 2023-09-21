@@ -56,13 +56,13 @@ class Operator {
         : m_lhs{std::move(lhs)}, m_rhs{std::move(rhs)} {}
 
     template<typename T>
-    auto lhs_accept(Visitor<T>& v) const -> T {
-        return m_lhs->accept(v);
+    auto evaluate_lhs(Visitor<T>& v) const -> T {
+        return m_lhs->evaluate(v);
     }
 
     template<typename T>
-    auto rhs_accept(Visitor<T>& v) const -> T {
-        return m_rhs->accept(v);
+    auto evaluate_rhs(Visitor<T>& v) const -> T {
+        return m_rhs->evaluate(v);
     }
 
     auto operator==(const Operator<Subtree>& rhs) const -> bool {
@@ -85,7 +85,7 @@ class Add : public Operator<Subtree> {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        return v.visit_addition(this->lhs_accept(v), this->rhs_accept(v));
+        return v.visit_addition(this->evaluate_lhs(v), this->evaluate_rhs(v));
     }
 };
 
@@ -100,7 +100,7 @@ class Sub : public Operator<Subtree> {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        return v.visit_subtraction(this->lhs_accept(v), this->rhs_accept(v));
+        return v.visit_subtraction(this->evaluate_lhs(v), this->evaluate_rhs(v));
     }
 };
 
@@ -115,7 +115,7 @@ struct Mult : public Operator<Subtree> {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        return v.visit_multiplication(this->lhs_accept(v), this->rhs_accept(v));
+        return v.visit_multiplication(this->evaluate_lhs(v), this->evaluate_rhs(v));
     }
 };
 
@@ -130,7 +130,7 @@ class Div : public Operator<Subtree> {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        return v.visit_division(this->lhs_accept(v), this->rhs_accept(v));
+        return v.visit_division(this->evaluate_lhs(v), this->evaluate_rhs(v));
     }
 };
 
@@ -145,7 +145,7 @@ struct Mod : public Operator<Subtree> {
 
     template <typename T>
     auto accept(Visitor<T>& v) const -> T {
-        return v.visit_modulo(this->lhs_accept(v), this->rhs_accept(v));
+        return v.visit_modulo(this->evaluate_lhs(v), this->evaluate_rhs(v));
     }
 };
 
