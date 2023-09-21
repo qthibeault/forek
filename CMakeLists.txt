@@ -13,6 +13,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Option to enable testing for FoRek library
 option(FOREK_ENABLE_TESTS "Enable testing FoRek library" ON)
 
+# Option to create python bindings
+option(FOREK_PYTHON_BINDINGS "Enable compiling python bindings" OFF)
+
 # Enable FetchContent module to download dependencies
 include(FetchContent)
 
@@ -64,4 +67,6 @@ if(FOREK_ENABLE_TESTS)
     add_subdirectory(tests)
 endif()
 
-add_subdirectory(python)
+if(FOREK_PYTHON_BINDINGS)
+    add_subdirectory(python)
+endif()
