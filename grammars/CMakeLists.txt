@@ -7,9 +7,14 @@ find_package(Git REQUIRED)
 # Define ANTLR4 jar name in one place
 set(ANTLR4_JAR_NAME antlr-4.13.0-complete.jar)
 
-# Set ANTLR4 build options
-set(WITH_DEMO OFF)
-set(ANTLR_BUILD_CPP_TESTS OFF)
+# Disable ANTLR demo
+set(WITH_DEMO False)
+
+# Disable ANTLR tests
+set(ANTLR_BUILD_CPP_TESTS False)
+
+# Disable ANTLR shared library
+set(ANTLR_BUILD_SHARED False)
 
 # Download ANTLR4 library
 FetchContent_Declare(antlr4
@@ -28,10 +33,7 @@ FetchContent_MakeAvailable(antlr4 antlr4-jar)
 list(APPEND CMAKE_MODULE_PATH ${antlr4_SOURCE_DIR}/runtime/Cpp/cmake)
 
 # Ensure ANTLR4 is compiled with C++14
-target_compile_features(antlr4_static PUBLIC cxx_std_17)
-
-set_target_properties(antlr4_shared PROPERTIES
-    EXCLUDE_FROM_ALL TRUE)
+target_compile_features(antlr4_static PUBLIC cxx_std_14)
 
 # Register ANTLR4 JAR
 set(ANTLR_EXECUTABLE ${antlr4-jar_SOURCE_DIR}/${ANTLR4_JAR_NAME})
