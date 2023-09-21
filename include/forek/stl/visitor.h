@@ -20,8 +20,8 @@ class Visitor : public virtual mtl::Visitor<T> {
     auto operator=(const Visitor<T>&) -> Visitor<T>& = default;
     auto operator=(Visitor<T>&&) -> Visitor<T>& = default;
 
-    virtual ~Visitor() = default;
     virtual auto visit_predicate(const Expr& lhs, Comparison cmp, const Expr& rhs) -> T = 0;
+    virtual ~Visitor() = default;
 };
 
 }  // namespace forek::stl
