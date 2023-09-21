@@ -11,8 +11,7 @@
 namespace forek::common {
 
 using interval::Interval;
-using interval::make_exclusive;
-using interval::make_inclusive;
+using interval::Endpoint;
 
 template <template <typename> typename Op, typename Tree>
 auto make_unary(std::any inner) -> std::shared_ptr<Tree> {
@@ -48,10 +47,10 @@ template <typename T>
 auto make_interval(T* ctx) -> Interval {
     auto lval = parse_interval_value<T, 0>(ctx);
     auto uval = parse_interval_value<T, 1>(ctx);
-    auto lower = ctx->LeftBracket() ? make_inclusive(lval) : make_exclusive(lval);
-    auto upper = ctx->RightBracket() ? make_inclusive(uval) : make_exclusive(uval);
+    auto lower = ctx->LeftBracket() ? Endpoint::closed(lval) : Endpoint::open(lval);
+    auto upper = ctx->RightBracket() ? Endpoint::closed(uval) : Endpoint::open(uval);
 
-    return Interval{lower, upper};
+    return { lower, upper };
 }
 
 class StringBuilder : public stl::Visitor<std::string> {
