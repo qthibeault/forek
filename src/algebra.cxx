@@ -64,7 +64,7 @@ class StringBuilder : public Visitor<std::string> {
 
 Expr::operator std::string() const {
     StringBuilder sb;
-    return this->accept(sb);
+    return this->evaluate(sb);
 }
 
 auto Expr::operator==(const Expr& rhs) const -> bool {
@@ -149,7 +149,7 @@ struct Sum::Builder : public Visitor<Sum> {
 
 Sum::Sum(const Expr& expr) {
     Builder b;
-    auto s = expr.accept(b);
+    auto s = expr.evaluate(b);
 
     this->m_constant = s.m_constant;
     this->m_coefficients = std::move(s.m_coefficients);
