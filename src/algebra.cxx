@@ -1,3 +1,4 @@
+#include <optional>
 #include <stdexcept>
 
 #include <fmt/format.h>
