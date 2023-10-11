@@ -3,6 +3,7 @@
 #include <initializer_list>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "forek/algebra/expr.h"
 
