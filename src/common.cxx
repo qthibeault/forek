@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "fmt/format.h"
 
 #include "common.h"
@@ -9,12 +11,26 @@ namespace forek::common {
 
 auto cmp_str(Comparison cmp) -> std::string_view {
     switch (cmp) {
-    case Comparison::LessThan: return "<";
-    case Comparison::LessThanEqual: return "<=";
-    case Comparison::Equal: return "=";
-    case Comparison::NotEqual: return "!=";
-    case Comparison::GreaterThanEqual: return ">=";
-    case Comparison::GreaterThan: return ">";
+    case Comparison::LessThan:
+        return "<";
+
+    case Comparison::LessThanEqual:
+        return "<=";
+
+    case Comparison::Equal:
+        return "=";
+
+    case Comparison::NotEqual:
+        return "!=";
+
+    case Comparison::GreaterThanEqual:
+        return ">=";
+
+    case Comparison::GreaterThan:
+        return ">";
+    
+    default:
+        throw std::runtime_error("Unknown comparison type");
     }
 }
 
