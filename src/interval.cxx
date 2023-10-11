@@ -1,4 +1,5 @@
 #include "forek/interval.h"
+#include <stdexcept>
 
 #include <fmt/format.h>
 
@@ -54,15 +55,27 @@ ZeroLengthInterval::ZeroLengthInterval(const Interval &i)
 
 auto start_symbol(Endpoint::Type type) -> char {
     switch(type) {
-    case Endpoint::Type::Open: return '(';
-    case Endpoint::Type::Closed: return '[';
+    case Endpoint::Type::Open:
+        return '(';
+
+    case Endpoint::Type::Closed:
+        return '[';
+
+    default:
+        throw std::runtime_error("Unknown endpoint type");
     }
 }
 
 auto end_symbol(Endpoint::Type type) -> char {
     switch(type) {
-    case Endpoint::Type::Open: return ')';
-    case Endpoint::Type::Closed: return ']';
+    case Endpoint::Type::Open:
+        return ')';
+
+    case Endpoint::Type::Closed:
+        return ']';
+
+    default:
+        throw std::runtime_error("Unknown endpoint type");
     }
 }
 
