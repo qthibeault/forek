@@ -10,6 +10,9 @@ project(forek
 # Create compile_commands.json for editor tooling support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Ensure code is compiled with PIC flag
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # Option to enable testing for FoRek library
 option(FOREK_ENABLE_TESTS "Enable testing FoRek library" ON)
 
