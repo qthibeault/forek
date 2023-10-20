@@ -28,7 +28,7 @@ endif()
 add_library(forek interval.cxx common.cxx algebra.cxx pl.cxx ltl.cxx mtl.cxx stl.cxx stpl.cxx tptl.cxx tqtl.cxx)
 
 target_include_directories(forek
-    PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/forek>)
+    PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/forek>)
 
 target_link_libraries(forek
     PRIVATE $<BUILD_INTERFACE:forek_grammars> $<BUILD_INTERFACE:fmt::fmt-header-only>)
